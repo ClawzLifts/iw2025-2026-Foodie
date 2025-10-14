@@ -3,9 +3,24 @@
 </p>
 
 ## Contexto de la Aplicación
-Orientada a pequeños negocios de comida rápida que requieran de herramientas de gestión accesibles y económicas.
+Orientada a pequeños negocios de comida rápida que requieran de herramientas de gestión accesibles y económicas, modular y de código abierto. Desarrollada conjuntamente por Jaime Bellido Medina, Jesus Rodriguez Acosta y Jose Luis Venega Sánchez para la asignatura Ingeniería Web en el curso 2025/26.
 
-## Requisitos Funcionales
+## Plan de Proyecto
+### Roles
+Se formará el equipo de trabajo mediante los siguientes roles:
+- Scrum Master: Jesus Rodriguez Acosta
+- Product Owner: Jose Luis Venega Sanchez
+- Arquitecto Software: Jaime Bellido Medina
+- Analista: Jesus Rodriguez Acosta
+- Programador: Todos los miembros
+- Tester: Jose Luis Venega Sanchez
+- Administrador de Sistemas: Jesus Rodriguez Acosta
+
+###
+
+
+## Análisis de Requisitos
+### Requisitos Funcionales
 - Toma de pedidos
 - Análisis de negocio
 - Front Office
@@ -18,9 +33,9 @@ Orientada a pequeños negocios de comida rápida que requieran de herramientas d
 	- Configuración dinámica de Menús
 	- Análisis de Negocio
 
+### Requisitos no Funcionales
 
-
-## Requisitos no Funcionales
+### Tecnologías específicas
 - Java 17/21
 - Spring Framework 6
 - Vaadin 24+
