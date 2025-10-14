@@ -1,5 +1,5 @@
 <p align = "center">
-	<img width="512" height="512" alt="Foodie Logo" />
+	<img width="512" height="512" alt="Foodie Logo" src="https://github.com/user-attachments/assets/a4fbbd85-d53d-431e-b7ca-88f31d978a5b />
 </p>
 
 ## Contexto de la Aplicación
