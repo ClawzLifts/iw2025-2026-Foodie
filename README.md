@@ -1,4 +1,4 @@
-<img width="512" height="512" alt="ChatGPT Image 14 oct 2025, 19_07_59-Photoroom" src="https://github.com/user-attachments/assets/a4fbbd85-d53d-431e-b7ca-88f31d978a5b" />
+<img width="512" height="512" align = center alt="Foodie Logo" />
 
 ## Contexto de la Aplicación
 Orientada a pequeños negocios de comida rápida que requieran de herramientas de gestión accesibles y económicas.
