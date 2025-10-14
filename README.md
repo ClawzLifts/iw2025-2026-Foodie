@@ -1,4 +1,6 @@
-<img width="512" height="512" align="center" alt="Foodie Logo" />
+<p align = "center">
+	<img width="512" height="512" alt="Foodie Logo" />
+</p>
 
 ## Contexto de la Aplicación
 Orientada a pequeños negocios de comida rápida que requieran de herramientas de gestión accesibles y económicas.
