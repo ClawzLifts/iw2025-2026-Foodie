@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: foodie-db
+    environment:
+      POSTGRES_DB: foodiedb
+      POSTGRES_USER: foodieuser
+      POSTGRES_PASSWORD: foodiepass123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - foodie-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U foodieuser -d foodiedb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+
+networks:
+  foodie-network:
+    driver: bridge
