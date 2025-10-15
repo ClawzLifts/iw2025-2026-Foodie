@@ -1,86 +1,41 @@
-# Foodie README
+<p align = "center">
+	<img width="512" height="512" alt="Foodie Logo" src="https://github.com/user-attachments/assets/a4fbbd85-d53d-431e-b7ca-88f31d978a5b" />
+</p>
 
-- [ ] TODO Replace or update this README with instructions relevant to your application
+## Contexto de la Aplicación
+Orientada a pequeños negocios de comida rápida que requieran de herramientas de gestión accesibles y económicas, modular y de código abierto. Desarrollada conjuntamente por Jaime Bellido Medina, Jesus Rodriguez Acosta y Jose Luis Venega Sánchez para la asignatura Ingeniería Web en el curso 2025/26.
 
-## Project Structure
+## Plan de Proyecto
+### Roles
+Se formará el equipo de trabajo mediante los siguientes roles:
+- Scrum Master: Jesus Rodriguez Acosta
+- Product Owner: Jose Luis Venega Sanchez
+- Arquitecto Software: Jaime Bellido Medina
+- Analista: Jesus Rodriguez Acosta
+- Programador: Todos los miembros
+- Tester: Jose Luis Venega Sanchez
+- Administrador de Sistemas: Jesus Rodriguez Acosta
 
-The sources of your Foodie have the following structure:
+###
 
-```
-src
-├── main/frontend
-│   └── themes
-│       └── default
-│           ├── styles.css
-│           └── theme.json
-├── main/java
-│   └── [application package]
-│       ├── base
-│       │   └── ui
-│       │       ├── component
-│       │       │   └── ViewToolbar.java
-│       │       ├── MainErrorHandler.java
-│       │       └── MainLayout.java
-│       ├── examplefeature
-│       │   ├── ui
-│       │   │   └── TaskListView.java
-│       │   ├── Task.java
-│       │   ├── TaskRepository.java
-│       │   └── TaskService.java                
-│       └── Application.java       
-└── test/java
-    └── [application package]
-        └── examplefeature
-           └── TaskServiceTest.java                 
-```
 
-The main entry point into the application is `Application.java`. This class contains the `main()` method that start up 
-the Spring Boot application.
+## Análisis de Requisitos
+### Requisitos Funcionales
+- Toma de pedidos
+- Análisis de negocio
+- Front Office
+	- Carta Interactiva
+	- Toma de pedidos
+	- Cobro Multi-método
+- Back Office
+	- Gestión de Pedidos
+	- Control de estado de Pedidos
+	- Configuración dinámica de Menús
+	- Análisis de Negocio
 
-The skeleton follows a *feature-based package structure*, organizing code by *functional units* rather than traditional 
-architectural layers. It includes two feature packages: `base` and `examplefeature`.
+### Requisitos no Funcionales
 
-* The `base` package contains classes meant for reuse across different features, either through composition or 
-  inheritance. You can use them as-is, tweak them to your needs, or remove them.
-* The `examplefeature` package is an example feature package that demonstrates the structure. It represents a 
-  *self-contained unit of functionality*, including UI components, business logic, data access, and an integration test.
-  Once you create your own features, *you'll remove this package*.
-
-The `src/main/frontend` directory contains an empty theme called `default`, based on the Lumo theme. It is activated in
-the `Application` class, using the `@Theme` annotation.
-
-## Starting in Development Mode
-
-To start the application in development mode, import it into your IDE and run the `Application` class. 
-You can also start the application from the command line by running: 
-
-```bash
-./mvnw
-```
-
-## Building for Production
-
-To build the application in production mode, run:
-
-```bash
-./mvnw -Pproduction package
-```
-
-To build a Docker image, run:
-
-```bash
-docker build -t my-application:latest .
-```
-
-If you use commercial components, pass the license key as a build secret:
-
-```bash
-docker build --secret id=proKey,src=$HOME/.vaadin/proKey .
-```
-
-## Getting Started
-
-The [Getting Started](https://vaadin.com/docs/latest/getting-started) guide will quickly familiarize you with your new
-Foodie implementation. You'll learn how to set up your development environment, understand the project 
-structure, and find resources to help you add muscles to your skeleton — transforming it into a fully-featured 
-application.
+### Tecnologías específicas
+- Java 17/21
+- Spring Framework 6
+- Vaadin 24+
