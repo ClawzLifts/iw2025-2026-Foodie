@@ -1,4 +1,4 @@
-package com.foodie.application.base.ui.views;
+package com.foodie.application.security.ui.views;
 
 import com.foodie.application.security.AuthService;
 import com.foodie.application.user.UserEntity;
