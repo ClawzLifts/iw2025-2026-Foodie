@@ -14,7 +14,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll() // Temporalmente permitir todo
+                        .anyRequest().permitAll() // Temporalmente permitir
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
