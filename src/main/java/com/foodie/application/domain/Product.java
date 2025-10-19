@@ -1,4 +1,4 @@
-package com.foodie.application.product;
+package com.foodie.application.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -14,16 +14,16 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "product")
-public class ProductEntity {
+public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @Column(nullable = false)
     private String name;
 
     @Column(nullable = false)
-    private double price;
+    private Double price;
 
     @Column(nullable = false)
     private String description;

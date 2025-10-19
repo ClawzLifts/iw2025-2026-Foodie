@@ -1,12 +1,13 @@
-package com.foodie.application.product;
+package com.foodie.application.dto;
 
+import com.foodie.application.domain.Product;
 import lombok.Value;
 
 import java.io.Serializable;
 import java.util.Set;
 
 /**
- * DTO for {@link ProductEntity}
+ * DTO for {@link Product}
  */
 @Value
 public class ProductEntityDto implements Serializable {

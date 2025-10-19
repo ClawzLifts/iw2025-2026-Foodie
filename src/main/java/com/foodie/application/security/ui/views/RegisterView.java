@@ -1,7 +1,7 @@
 package com.foodie.application.security.ui.views;
 
 import com.foodie.application.security.AuthService;
-import com.foodie.application.user.UserEntity;
+import com.foodie.application.domain.User;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H1;
@@ -51,7 +51,7 @@ public class RegisterView extends VerticalLayout {
             }
 
             try {
-                UserEntity user = authService.registerUser(
+                User user = authService.registerUser(
                         username.getValue(),
                         password.getValue(),
                         email.getValue(),

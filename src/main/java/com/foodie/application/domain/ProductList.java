@@ -1,5 +1,6 @@
-package com.foodie.application.order;
+package com.foodie.application.domain;
 
+import jakarta.persistence.Entity;
 import lombok.*;
 
 /**
@@ -18,7 +19,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductListEntity {
+public class ProductList {
 
     private Integer productId;
     private String productName;
