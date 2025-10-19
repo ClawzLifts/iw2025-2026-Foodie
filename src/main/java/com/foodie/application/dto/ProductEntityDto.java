@@ -11,9 +11,9 @@ import java.util.Set;
  */
 @Value
 public class ProductEntityDto implements Serializable {
-    int id;
+    Integer id;
     String name;
-    double price;
+    Double price;
     String description;
     Set<Set<String>> allergens;
 }

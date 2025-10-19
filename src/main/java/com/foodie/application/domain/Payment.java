@@ -19,6 +19,10 @@ public class Payment {
     private Order order;
 
     private Double paymentAmount;
-    private String paymentMethod;
-    private String paymentStatus;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod paymentMethod;
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus;
 }
+

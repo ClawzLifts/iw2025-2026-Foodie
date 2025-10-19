@@ -2,12 +2,14 @@ package com.foodie.application.domain;
 
 import com.foodie.application.domain.Product;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "menu_item")
 public class MenuItem {
     @Id

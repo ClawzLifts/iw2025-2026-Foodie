@@ -28,7 +28,7 @@ import org.hibernate.annotations.Check;
 @AllArgsConstructor
 @Data
 @Table(name = "users")
-@Check(constraints = "role IN ('USUARIO', 'MANAGER')")
+@Check(constraints = "role IN ('USER', 'MANAGER', 'ADMIN')")
 public class User {
 
     @Id
