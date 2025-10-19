@@ -1,6 +1,5 @@
-package com.foodie.application.payment;
+package com.foodie.application.domain;
 
-import com.foodie.application.order.OrderEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,14 +9,14 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "payment")
-public class PaymentEntity {
+public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @JoinColumn(name="order_id")
     @OneToOne (mappedBy = "payment")
-    private OrderEntity order;
+    private Order order;
 
     private Double paymentAmount;
     private String paymentMethod;

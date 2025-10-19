@@ -1,7 +1,7 @@
-package com.foodie.application.user;
+package com.foodie.application.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.foodie.application.order.OrderEntity;
+
 import java.util.List;
 import java.util.Set;
 
@@ -29,12 +29,12 @@ import org.hibernate.annotations.Check;
 @Data
 @Table(name = "users")
 @Check(constraints = "role IN ('USUARIO', 'MANAGER')")
-public class UserEntity {
+public class User {
 
     @Id
     @Column(unique = true , nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Column(unique = true)
     private String username;
@@ -51,5 +51,5 @@ public class UserEntity {
 
     @JsonIgnore
     @OneToMany
-    private List<OrderEntity> orders;
+    private List<Order> orders;
 }
