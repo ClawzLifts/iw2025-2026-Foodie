@@ -55,7 +55,7 @@ public class RegisterView extends VerticalLayout {
                         username.getValue(),
                         password.getValue(),
                         email.getValue(),
-                        "CLIENTE" // rol por defecto
+                        "USER" // rol por defecto
                 );
 
                 Notification.show("Usuario " + user.getUsername() + " registrado con éxito 🎉",
