@@ -2,12 +2,16 @@ package com.foodie.application.service;
 
 import com.foodie.application.domain.Menu;
 import com.foodie.application.domain.MenuItem;
+import com.foodie.application.dto.MenuDto;
 import com.foodie.application.dto.MenuItemDto;
+import com.foodie.application.dto.ProductDto;
 import com.foodie.application.repository.MenuRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MenuService {
@@ -18,6 +22,22 @@ public class MenuService {
     public MenuService(MenuRepository menuRepository, MenuItemService menuItemService) {
         this.menuRepository = menuRepository;
         this.menuItemService = menuItemService;
+    }
+
+    @Transactional
+    public List<MenuDto> getMenus(){
+        List<MenuDto> menus = new ArrayList<>();
+        menuRepository.findAll().forEach(menu -> menus.add(menu.toDto()));
+        return menus;
+    }
+
+    @Transactional
+    public List<ProductDto> getProducts(Integer menuId) {
+        Optional<Menu> optMenu = menuRepository.findById(menuId);
+        List<ProductDto> products = new ArrayList<>();
+        optMenu.ifPresent(
+                menu -> menu.getMenuItems().forEach(item -> products.add(item.getProduct().toDto())));
+        return products;
     }
 
     @Transactional
@@ -51,5 +71,4 @@ public class MenuService {
         Menu menu = menuRepository.findById(menuId).orElseThrow();
         menu.setName(newName);
     }
-
 }
