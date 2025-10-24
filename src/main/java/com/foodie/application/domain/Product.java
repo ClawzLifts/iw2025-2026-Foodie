@@ -1,5 +1,6 @@
 package com.foodie.application.domain;
 
+import com.foodie.application.dto.ProductDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,5 +29,11 @@ public class Product {
     @Column(nullable = false)
     private String description;
 
+    private String imageUrl;
+
     private Set<String> allergens;
+
+    public ProductDto toDto(){
+        return new ProductDto(this);
+    }
 }

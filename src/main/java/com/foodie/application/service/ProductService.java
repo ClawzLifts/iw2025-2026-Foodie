@@ -1,9 +1,12 @@
 package com.foodie.application.service;
 
+import com.foodie.application.domain.Product;
 import com.foodie.application.repository.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class ProductService {
@@ -20,6 +23,10 @@ public class ProductService {
             throw new EntityNotFoundException("Product not found with id: " + productId);
         }
         productRepository.deleteById(productId);
+    }
+
+    public List<Product> getAllProducts(Integer menuId) {
+        return productRepository.findAll();
     }
 
     @Transactional
@@ -57,4 +64,7 @@ public class ProductService {
         product.getAllergens().removeAll(allergensToRemove);
     }
 
+    public List<Product> getProducts(int i) {
+        return null;
+    }
 }
