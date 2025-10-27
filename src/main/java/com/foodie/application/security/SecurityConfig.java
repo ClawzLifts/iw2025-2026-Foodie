@@ -7,46 +7,32 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 @Configuration
 public class SecurityConfig {
-
     @Autowired
-    private RoleBasedSuccessHandler successHandler;
-
+    private RoleBasedSuccessHandler roleBasedSuccessHandler;
     @Autowired
-    @Qualifier("userDetailsServiceImpl")
-    private UserDetailsService userDetailsService;
+    private UserDetailsServiceImpl userDetailsService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .userDetailsService(userDetailsService)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/register", "/error").permitAll()
-                        .requestMatchers(
-                                "/VAADIN/**",
-                                "/PUSH/**",
-                                "/UIDL/**",
-                                "/HEARTBEAT/**",
-                                "/frontend/**",
-                                "/webjars/**",
-                                "/images/**",
-                                "/icons/**",
-                                "/manifest.webmanifest",
-                                "/sw.js",
-                                "/offline.html",
-                                "/vaadinServlet/**"
+                        .requestMatchers("/", "/login", "/register", "/image/**",
+                                "/frontend/**", "/VAADIN/**", "/vaadin/**", "/webjars/**",
+                                "/favicon.ico", "/robots.txt", "/manifest.webmanifest", "/sw.js",
+                                "/offline.html", "/icons/**", "/images/**", "/styles/**"
                         ).permitAll()
                         .requestMatchers("/dashboard/**").hasRole("MANAGER")
-                        .requestMatchers("/carta/**", "/carrito/**", "/pago/**").hasRole("CLIENTE")
+                        .requestMatchers("/carta/**", "/carrito/**", "/pago/**", "/foodmenu").hasRole("USER")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/login")
-                        .loginProcessingUrl("/perform_login")
-                        .successHandler(successHandler)
+                        .loginPage("/login")                // GET login form
+                        .loginProcessingUrl("/perform_login") // POST login creds
+                        .successHandler(roleBasedSuccessHandler)
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
@@ -55,8 +41,7 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/login?logout")
                         .permitAll()
                 )
-                .csrf(csrf -> csrf.disable())
-                .userDetailsService(userDetailsService);
+                .csrf(csrf -> csrf.disable());
 
         return http.build();
     }

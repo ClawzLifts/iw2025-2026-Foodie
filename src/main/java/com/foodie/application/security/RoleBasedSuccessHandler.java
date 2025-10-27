@@ -16,10 +16,11 @@ public class RoleBasedSuccessHandler implements AuthenticationSuccessHandler {
         var roles = authentication.getAuthorities();
         if (roles.stream().anyMatch(r -> r.getAuthority().equals("ROLE_MANAGER"))) {
             response.sendRedirect("/dashboard");
-        } else if (roles.stream().anyMatch(r -> r.getAuthority().equals("ROLE_CLIENTE"))) {
+        } else if (roles.stream().anyMatch(r -> r.getAuthority().equals("ROLE_USER"))) {
             response.sendRedirect("/carta");
         } else {
             response.sendRedirect("/login?error=role");
         }
     }
 }
+

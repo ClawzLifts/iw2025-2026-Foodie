@@ -71,6 +71,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         // También puedes verificar logout
         if (queryParameters.getParameters().containsKey("logout")) {
             // Mostrar mensaje de logout exitoso si quieres
+
         }
     }
 
