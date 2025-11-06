@@ -30,8 +30,25 @@ public class UserService {
         User user = User.builder()
                 .username(username)
                 .password(passwordEncoder.encode(rawPassword))
-                .role("CLIENTE")
+                .role("USER")
                 .build();
         return userRepository.save(user);
+    }
+
+    public User registerUserByManager(String username, String rawPassword, String role, String email) {
+        if (userRepository.findByUsername(username).isPresent()) {
+            throw new RuntimeException("Usuario ya existe");
+        }
+        User user = User.builder()
+                .username(username)
+                .password(passwordEncoder.encode(rawPassword))
+                .role(role)
+                .email(email)
+                .build();
+        return userRepository.save(user);
+    }
+
+    public java.util.List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 }

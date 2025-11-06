@@ -1,6 +1,7 @@
 package com.foodie.application.service;
 
 import com.foodie.application.domain.Order;
+import com.foodie.application.domain.Product;
 import com.foodie.application.domain.User;
 import com.foodie.application.repository.OrderRepository;
 import com.foodie.application.repository.ProductRepository;
@@ -42,5 +43,7 @@ public class DashboardService {
         return user.map(orderRepository::findByUser).orElse(List.of());
     }
 
-    // Añade métodos según KPIs del dashboard
+    public List<Product> getAllProducts() {
+        return productRepository.findAll();
+    }
 }

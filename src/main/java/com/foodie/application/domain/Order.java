@@ -8,6 +8,7 @@ import org.hibernate.type.SqlTypes;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Entity
 @Data
 @Builder
@@ -24,6 +25,7 @@ public class Order {
     @JoinColumn(name="user_id")
     private User user;
 
+    @Builder.Default
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private List<ProductList> items = new ArrayList<>();
@@ -31,4 +33,9 @@ public class Order {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="payment_id")
     private Payment payment;
+
+    private String status;
+
+    @Builder.Default
+    private Double totalAmount = 0.0;
 }

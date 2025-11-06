@@ -19,16 +19,17 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .userDetailsService(userDetailsService)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/register", "/image/**",
-                                "/frontend/**", "/VAADIN/**", "/vaadin/**", "/webjars/**",
-                                "/favicon.ico", "/robots.txt", "/manifest.webmanifest", "/sw.js",
-                                "/offline.html", "/icons/**", "/images/**", "/styles/**"
-                        ).permitAll()
-                        .requestMatchers("/dashboard/**").hasRole("MANAGER")
-                        .requestMatchers("/carta/**", "/carrito/**", "/pago/**", "/foodmenu").hasRole("USER")
-                        .anyRequest().authenticated()
-                )
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().permitAll())
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/", "/login", "/register", "/image/**",
+//                                "/frontend/**", "/VAADIN/**", "/vaadin/**", "/webjars/**",
+//                                "/favicon.ico", "/robots.txt", "/manifest.webmanifest", "/sw.js",
+//                                "/offline.html", "/icons/**", "/images/**", "/styles/**"
+//                        ).permitAll()
+//                        .requestMatchers("/dashboard/**").hasRole("MANAGER")
+//                        .requestMatchers("/carta/**", "/carrito/**", "/pago/**", "/foodmenu").hasRole("USER")
+//                        .anyRequest().authenticated()
+//                )
                 .formLogin(form -> form
                         .loginPage("/login")                // GET login form
                         .loginProcessingUrl("/perform_login") // POST login creds
