@@ -42,6 +42,7 @@ public class DashboardView extends VerticalLayout {
 
     private final VerticalLayout contentLayout;
     private final Grid<Order> ordersGrid = new Grid<>(Order.class);
+    private final Grid<User> userGrid = new Grid<>(User.class, false);
 
     @Autowired
     public DashboardView(DashboardService dashboardService, ProductService productService, UserService userService) {
@@ -541,7 +542,6 @@ public class DashboardView extends VerticalLayout {
         addUserButton.addClickListener(e -> showAddUserDialog());
 
         // Grid de usuarios
-        Grid<User> userGrid = new Grid<>(User.class, false);
         userGrid.addColumn(User::getUsername).setHeader("Usuario");
         userGrid.addColumn(User::getEmail).setHeader("Correo Electrónico");
         userGrid.addColumn(User::getRole).setHeader("Rol");
@@ -550,13 +550,21 @@ public class DashboardView extends VerticalLayout {
 
             Button editBtn = new Button("Editar");
             editBtn.addThemeVariants(ButtonVariant.LUMO_SMALL);
+            editBtn.addClickListener(e -> showEditUserDialog(user));
             editBtn.getStyle().set("cursor", "pointer");
-            editBtn.addClickListener(e -> showNotification("Funcionalidad de editar usuario pendiente", NotificationVariant.LUMO_CONTRAST));
 
             Button deleteBtn = new Button("Eliminar");
             deleteBtn.getStyle().set("cursor", "pointer");
             deleteBtn.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_ERROR);
-            deleteBtn.addClickListener(e -> showNotification("Funcionalidad de eliminar usuario pendiente", NotificationVariant.LUMO_CONTRAST));
+            deleteBtn.addClickListener(e -> {
+                try {
+                    userService.deleteUser(user.getId());
+                    userGrid.setItems(userService.getAllUsers());
+                    showNotification("Usuario eliminado correctamente", NotificationVariant.LUMO_SUCCESS);
+                } catch (Exception ex) {
+                    showNotification("Error al eliminar usuario: " + ex.getMessage(), NotificationVariant.LUMO_ERROR);
+                }
+            });
 
             actions.add(editBtn, deleteBtn);
             return actions;
@@ -571,6 +579,43 @@ public class DashboardView extends VerticalLayout {
         buttonWrapper.add(addUserButton);
 
         contentLayout.add(title, buttonWrapper, userGrid);
+    }
+
+    private void showEditUserDialog(User user) {
+        Dialog dialog = new Dialog();
+        dialog.setWidth("500px");
+
+        FormLayout formLayout = new FormLayout();
+
+        TextField nameField = new TextField("Nombre");
+        nameField.setValue(user.getUsername());
+
+        TextField emailField = new TextField("Correo electrónico");
+        emailField.setValue(user.getEmail());
+
+        formLayout.add(nameField, emailField);
+
+        Button saveBtn = new Button("Guardar", e -> {
+            try {
+                userService.updateUser(user.getId(), nameField.getValue(), emailField.getValue());
+                showNotification("Usuario actualizado correctamente", NotificationVariant.LUMO_SUCCESS);
+                dialog.close();
+                userGrid.setItems(userService.getAllUsers());
+            } catch (Exception ex) {
+                showNotification("Error al actualizar usuario: " + ex.getMessage(), NotificationVariant.LUMO_ERROR);
+            }
+        });
+        saveBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveBtn.getStyle().set("cursor", "pointer");
+
+        Button cancelBtn = new Button("Cancelar", e -> dialog.close());
+        cancelBtn.getStyle().set("cursor", "pointer");
+
+        HorizontalLayout buttons = new HorizontalLayout(saveBtn, cancelBtn);
+
+        VerticalLayout layout = new VerticalLayout(new H3("Editar Usuario"), formLayout, buttons);
+        dialog.add(layout);
+        dialog.open();
     }
 
     private void showAnalytics() {

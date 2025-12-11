@@ -58,4 +58,19 @@ public class UserService {
     public java.util.List<String> getAllRoles() {
         return List.of("USER", "MANAGER");
     }
+
+    public void deleteUser(Integer userId) {
+        userRepository.deleteById(userId);
+    }
+
+    public User updateUser(Integer userId, String username, String email) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isEmpty()) {
+            throw new RuntimeException("Usuario no encontrado");
+        }
+        User user = optionalUser.get();
+        user.setUsername(username);
+        user.setEmail(email);
+        return userRepository.save(user);
+    }
 }
