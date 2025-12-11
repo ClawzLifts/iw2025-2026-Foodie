@@ -3,6 +3,7 @@ package com.foodie.application.ui;
 import com.foodie.application.domain.Order;
 import com.foodie.application.domain.Product;
 import com.foodie.application.domain.User;
+import com.foodie.application.domain.Menu;
 import com.foodie.application.service.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -21,13 +22,14 @@ import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.vaadin.flow.component.UI;
 
 import java.util.List;
+import com.vaadin.flow.component.combobox.ComboBox;
 
 @Route("dashboard")
 @PageTitle("Dashboard Manager | Foodie")
@@ -36,19 +38,15 @@ public class DashboardView extends VerticalLayout {
 
     private final DashboardService dashboardService;
     private final ProductService productService;
-    private final OrderService orderService;
-    private final MenuService menuService;
     private final UserService userService;
 
     private final VerticalLayout contentLayout;
+    private final Grid<Order> ordersGrid = new Grid<>(Order.class);
 
     @Autowired
-    public DashboardView(DashboardService dashboardService, ProductService productService,
-                         OrderService orderService, MenuService menuService, UserService userService) {
+    public DashboardView(DashboardService dashboardService, ProductService productService, UserService userService) {
         this.dashboardService = dashboardService;
         this.productService = productService;
-        this.orderService = orderService;
-        this.menuService = menuService;
         this.userService = userService;
 
         setSizeFull();
@@ -57,6 +55,7 @@ public class DashboardView extends VerticalLayout {
         // Título principal
         H2 titulo = new H2("Panel de Manager");
         titulo.getStyle().set("margin-bottom", "20px");
+        titulo.getStyle().set("text-align", "center");
 
         // Crear pestañas
         Tab overviewTab = new Tab("Resumen");
@@ -73,6 +72,7 @@ public class DashboardView extends VerticalLayout {
         contentLayout = new VerticalLayout();
         contentLayout.setSizeFull();
         contentLayout.setPadding(false);
+        contentLayout.setAlignItems(Alignment.CENTER);
 
         // Mostrar vista inicial
         showOverview();
@@ -102,11 +102,14 @@ public class DashboardView extends VerticalLayout {
 
     private void showOverview() {
         H3 title = new H3("Resumen General");
+        title.getStyle().set("text-align", "center");
 
         // KPIs principales
         HorizontalLayout kpisLayout = new HorizontalLayout();
         kpisLayout.setWidthFull();
         kpisLayout.setSpacing(true);
+        kpisLayout.setJustifyContentMode(JustifyContentMode.CENTER);
+        kpisLayout.setAlignItems(Alignment.CENTER);
 
         VerticalLayout productsKpi = createKpiCard("Productos Totales",
                 String.valueOf(dashboardService.countProducts()), "📦");
@@ -146,9 +149,15 @@ public class DashboardView extends VerticalLayout {
 
     private void showOrders() {
         H3 title = new H3("Gestión de Órdenes");
+        title.getStyle().set("text-align", "center");
 
-        // Crear grid de órdenes
-        Grid<Order> ordersGrid = new Grid<>(Order.class, false);
+        ComboBox<String> statusFilter = new ComboBox<>("Filtrar por Estado");
+        statusFilter.setItems("TODOS", "EN_PROCESO", "COMPLETADO");
+        statusFilter.addValueChangeListener(event -> {
+            String status = event.getValue();
+            ordersGrid.setItems(dashboardService.getOrdersByStatus(status));
+        });
+
         ordersGrid.addColumn(Order::getId).setHeader("ID").setSortable(true);
         ordersGrid.addColumn(order -> order.getUser().getUsername()).setHeader("Usuario");
         ordersGrid.addColumn(Order::getStatus).setHeader("Estado");
@@ -167,8 +176,12 @@ public class DashboardView extends VerticalLayout {
         List<Order> orders = dashboardService.getAllOrders();
         ordersGrid.setItems(orders);
         ordersGrid.setHeight("500px");
+        ordersGrid.setWidthFull();
 
-        contentLayout.add(title, ordersGrid);
+        VerticalLayout filterLayout = new VerticalLayout(statusFilter);
+        filterLayout.setAlignItems(Alignment.CENTER);
+
+        contentLayout.add(title, filterLayout, ordersGrid);
     }
 
     private void showOrderDetails(Order order) {
@@ -199,6 +212,7 @@ public class DashboardView extends VerticalLayout {
 
     private void showProducts() {
         H3 title = new H3("Gestión de Productos");
+        title.getStyle().set("text-align", "center");
 
         Button addProductBtn = new Button("Añadir Producto");
         addProductBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -237,8 +251,13 @@ public class DashboardView extends VerticalLayout {
 
         productsGrid.setItems(dashboardService.getAllProducts());
         productsGrid.setHeight("500px");
+        productsGrid.setWidthFull();
 
-        contentLayout.add(title, addProductBtn, productsGrid);
+        VerticalLayout buttonWrapper = new VerticalLayout();
+        buttonWrapper.setAlignItems(Alignment.CENTER);
+        buttonWrapper.add(addProductBtn);
+
+        contentLayout.add(title, buttonWrapper, productsGrid);
     }
 
     private void showAddProductDialog() {
@@ -255,9 +274,27 @@ public class DashboardView extends VerticalLayout {
         formLayout.add(nameField, priceField, descriptionField, imageUrlField);
 
         Button saveBtn = new Button("Guardar", e -> {
-            // Aquí deberías crear el producto
-            showNotification("Funcionalidad de añadir producto pendiente de implementar", NotificationVariant.LUMO_CONTRAST);
-            dialog.close();
+            try {
+                if (nameField.isEmpty() || priceField.isEmpty()) {
+                    showNotification("El nombre y el precio son obligatorios.", NotificationVariant.LUMO_ERROR);
+                    return;
+                }
+
+                Product newProduct = new Product();
+                newProduct.setName(nameField.getValue());
+                newProduct.setPrice(priceField.getValue());
+                newProduct.setDescription(descriptionField.getValue());
+                newProduct.setImageUrl(imageUrlField.getValue());
+
+                productService.addProduct(newProduct);
+                showNotification("Producto añadido correctamente", NotificationVariant.LUMO_SUCCESS);
+
+                contentLayout.removeAll();
+                showProducts();
+                dialog.close();
+            } catch (Exception ex) {
+                showNotification("Error al añadir producto: " + ex.getMessage(), NotificationVariant.LUMO_ERROR);
+            }
         });
         saveBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
@@ -277,19 +314,33 @@ public class DashboardView extends VerticalLayout {
         FormLayout formLayout = new FormLayout();
 
         TextField nameField = new TextField("Nombre");
-        TextArea emailField = new TextArea("Correo electrónico");
-        TextField passwordField = new TextField("Contraseña");
-        TextField rolField = new TextField("Rol");
+        TextField emailField = new TextField("Correo electrónico");
+        PasswordField passwordField = new PasswordField("Contraseña");
 
-        formLayout.add(nameField, emailField, passwordField, rolField);
+        // Mostramos los roles disponibles en el backend
+        ComboBox<String> roleSelector = new ComboBox<>("Rol");
+        // Log available roles for debugging
+        List<String> roles = userService.getAllRoles();
+        System.out.println("Available roles: " + roles);
+        roleSelector.setItems(roles);
+        roleSelector.setPlaceholder("Selecciona un rol");
+        roleSelector.setWidthFull();
+        roleSelector.setRequired(true);
+        roleSelector.setAllowCustomValue(false);
+
+        formLayout.add(nameField, emailField, passwordField, roleSelector);
 
         Button saveBtn = new Button("Guardar", e -> {
             try {
-                User newUser = userService.registerUserByManager(
+                if (roleSelector.getValue() == null) {
+                    showNotification("Por favor, selecciona un rol.", NotificationVariant.LUMO_ERROR);
+                    return;
+                }
+                User newUser = userService.registerUser(
                     nameField.getValue(),
+                    emailField.getValue(),
                     passwordField.getValue(),
-                    rolField.getValue(),
-                    emailField.getValue()
+                    roleSelector.getValue()
                 );
                 showNotification("Usuario '" + newUser.getUsername() + "' creado correctamente", NotificationVariant.LUMO_SUCCESS);
                 dialog.close();
@@ -352,13 +403,119 @@ public class DashboardView extends VerticalLayout {
 
     private void showMenu() {
         H3 title = new H3("Gestión de Menú");
-        Span info = new Span("Aquí puedes añadir y eliminar productos de la carta del restaurante.");
+        title.getStyle().set("text-align", "center");
 
-        contentLayout.add(title, info);
+        Span info = new Span("Aquí puedes ver todos los menús disponibles.");
+        info.getStyle().set("text-align", "center");
+
+        // Crear grid para mostrar los menús
+        Grid<Menu> menuGrid = new Grid<>(Menu.class, false);
+        menuGrid.addColumn(Menu::getId).setHeader("ID").setWidth("80px");
+        menuGrid.addColumn(Menu::getName).setHeader("Nombre");
+
+        // Agregar listener para abrir lista de comidas al hacer clic en un menú
+        menuGrid.addItemClickListener(event -> {
+            Menu selectedMenu = event.getItem();
+            showMenuItemsDialog(selectedMenu);
+        });
+
+        // Obtener menús desde el servicio
+        List<Menu> menus = dashboardService.getAllMenusWithItems();
+        menuGrid.setItems(menus);
+        menuGrid.setHeight("500px");
+        menuGrid.setWidthFull();
+
+        contentLayout.add(title, info, menuGrid);
+    }
+
+    private void showMenuItemsDialog(Menu menu) {
+        Dialog dialog = new Dialog();
+        dialog.setWidth("600px");
+
+        VerticalLayout layout = new VerticalLayout();
+        layout.add(new H3("Comidas en el menú: " + menu.getName()));
+
+        // Volver a cargar el menú desde el servicio para garantizar que esté completamente inicializado
+        Menu reloadedMenu = dashboardService.getMenuById(menu.getId());
+
+        try {
+            if (reloadedMenu.getMenuItems() != null && !reloadedMenu.getMenuItems().isEmpty()) {
+                reloadedMenu.getMenuItems().forEach(item -> {
+                    HorizontalLayout itemLayout = new HorizontalLayout();
+                    itemLayout.add(new Span(item.getName() + " (" + item.getPrice() + " €)"));
+
+                    Button deleteBtn = new Button("Eliminar", e -> {
+                        try {
+                            dashboardService.removeMenuItem(menu.getId(), item.getId());
+                            showNotification("Producto eliminado del menú", NotificationVariant.LUMO_SUCCESS);
+                            dialog.close();
+                            showMenuItemsDialog(menu);
+                        } catch (Exception ex) {
+                            showNotification("Error al eliminar producto: " + ex.getMessage(), NotificationVariant.LUMO_ERROR);
+                        }
+                    });
+                    deleteBtn.addThemeVariants(ButtonVariant.LUMO_ERROR);
+
+                    itemLayout.add(deleteBtn);
+                    layout.add(itemLayout);
+                });
+            } else {
+                layout.add(new Span("No hay comidas en este menú."));
+            }
+        } catch (Exception e) {
+            layout.add(new Span("Error al cargar las comidas: " + e.getMessage()));
+        }
+
+        // Botón para añadir productos al menú
+        Button addProductBtn = new Button("Añadir Producto", e -> showAddProductToMenuDialog(menu, dialog));
+        addProductBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        layout.add(addProductBtn);
+
+        Button closeBtn = new Button("Cerrar", e -> dialog.close());
+        layout.add(closeBtn);
+
+        dialog.add(layout);
+        dialog.open();
+    }
+
+    private void showAddProductToMenuDialog(Menu menu, Dialog parentDialog) {
+        Dialog dialog = new Dialog();
+        dialog.setWidth("500px");
+
+        ComboBox<Product> productComboBox = new ComboBox<>("Seleccionar Producto");
+        productComboBox.setItems(dashboardService.getAllProducts());
+        productComboBox.setItemLabelGenerator(Product::getName);
+
+        Button addBtn = new Button("Añadir", e -> {
+            Product selectedProduct = productComboBox.getValue();
+            if (selectedProduct != null) {
+                try {
+                    dashboardService.addMenuItem(menu.getId(), selectedProduct.getId());
+                    showNotification("Producto añadido al menú", NotificationVariant.LUMO_SUCCESS);
+                    dialog.close();
+                    parentDialog.close();
+                    showMenuItemsDialog(menu);
+                } catch (Exception ex) {
+                    showNotification("Error al añadir producto: " + ex.getMessage(), NotificationVariant.LUMO_ERROR);
+                }
+            } else {
+                showNotification("Por favor, selecciona un producto.", NotificationVariant.LUMO_ERROR);
+            }
+        });
+        addBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+        Button cancelBtn = new Button("Cancelar", e -> dialog.close());
+
+        HorizontalLayout buttons = new HorizontalLayout(addBtn, cancelBtn);
+
+        VerticalLayout layout = new VerticalLayout(new H3("Añadir Producto al Menú"), productComboBox, buttons);
+        dialog.add(layout);
+        dialog.open();
     }
 
     private void showUsers() {
         H3 title = new H3("Gestión de Usuarios");
+        title.getStyle().set("text-align", "center");
 
         Button addUserButton = new Button("Añadir Usuario");
         addUserButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -386,12 +543,18 @@ public class DashboardView extends VerticalLayout {
 
         userGrid.setItems(userService.getAllUsers());
         userGrid.setHeight("500px");
+        userGrid.setWidthFull();
 
-        contentLayout.add(title, addUserButton, userGrid);
+        VerticalLayout buttonWrapper = new VerticalLayout();
+        buttonWrapper.setAlignItems(Alignment.CENTER);
+        buttonWrapper.add(addUserButton);
+
+        contentLayout.add(title, buttonWrapper, userGrid);
     }
 
     private void showAnalytics() {
         H3 title = new H3("Análisis de Negocio");
+        title.getStyle().set("text-align", "center");
 
         List<Order> orders = dashboardService.getAllOrders();
 
@@ -407,6 +570,8 @@ public class DashboardView extends VerticalLayout {
         // KPIs de análisis
         HorizontalLayout analyticsKpis = new HorizontalLayout();
         analyticsKpis.setWidthFull();
+        analyticsKpis.setJustifyContentMode(JustifyContentMode.CENTER);
+        analyticsKpis.setAlignItems(Alignment.CENTER);
 
         VerticalLayout revenueKpi = createKpiCard("Ingresos Totales",
                 String.format("%.2f €", totalRevenue), "💰");
@@ -422,7 +587,8 @@ public class DashboardView extends VerticalLayout {
                 .set("color", "#ff9800")
                 .set("font-weight", "bold")
                 .set("font-size", "16px")
-                .set("margin-top", "20px");
+                .set("margin-top", "20px")
+                .set("text-align", "center");
 
         contentLayout.add(title, analyticsKpis, premiumInfo);
     }

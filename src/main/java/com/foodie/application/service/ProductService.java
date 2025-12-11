@@ -74,4 +74,12 @@ public class ProductService {
     public List<Product> getProducts(int i) {
         return null;
     }
+
+    @Transactional
+    public void addProduct(Product product) {
+        if (product == null) {
+            throw new IllegalArgumentException("El producto no puede ser nulo");
+        }
+        productRepository.save(product);
+    }
 }

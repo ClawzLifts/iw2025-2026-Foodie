@@ -31,6 +31,12 @@ public class MenuService {
         return menus;
     }
 
+    public List<MenuDto> getMenuById(Integer menuId){
+        List<MenuDto> menus = new ArrayList<>();
+        menuRepository.findById(menuId).ifPresent(menu -> menus.add(menu.toDto()));
+        return menus;
+    }
+
     @Transactional
     public List<ProductDto> getProducts(Integer menuId) {
         Optional<Menu> optMenu = menuRepository.findById(menuId);

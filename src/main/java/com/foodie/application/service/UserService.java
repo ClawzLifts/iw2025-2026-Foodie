@@ -5,6 +5,7 @@ import com.foodie.application.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,17 +24,19 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
-    public User registerUser(String username, String rawPassword) {
+    public User registerUser(String username, String rawPassword, String email, String role) {
         if (userRepository.findByUsername(username).isPresent()) {
             throw new RuntimeException("Usuario ya existe");
         }
         User user = User.builder()
                 .username(username)
                 .password(passwordEncoder.encode(rawPassword))
-                .role("USER")
+                .email(email)
+                .role(role != null ? role : "USER")
                 .build();
         return userRepository.save(user);
     }
+
 
     public User registerUserByManager(String username, String rawPassword, String role, String email) {
         if (userRepository.findByUsername(username).isPresent()) {
@@ -50,5 +53,9 @@ public class UserService {
 
     public java.util.List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    public java.util.List<String> getAllRoles() {
+        return List.of("USER", "MANAGER");
     }
 }
