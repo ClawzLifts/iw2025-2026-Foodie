@@ -59,11 +59,17 @@ public class DashboardView extends VerticalLayout {
 
         // Crear pestañas
         Tab overviewTab = new Tab("Resumen");
+        overviewTab.getStyle().set("cursor", "pointer");
         Tab ordersTab = new Tab("Órdenes");
+        ordersTab.getStyle().set("cursor", "pointer");
         Tab productsTab = new Tab("Productos");
+        productsTab.getStyle().set("cursor", "pointer");
         Tab menuTab = new Tab("Menú");
+        menuTab.getStyle().set("cursor", "pointer");
         Tab usersTab = new Tab("Usuarios");
+        usersTab.getStyle().set("cursor", "pointer");
         Tab analyticsTab = new Tab("Análisis de Negocio");
+        analyticsTab.getStyle().set("cursor", "pointer");
 
         Tabs tabs = new Tabs(overviewTab, ordersTab, productsTab, menuTab, usersTab, analyticsTab);
         tabs.setWidthFull();
@@ -152,6 +158,7 @@ public class DashboardView extends VerticalLayout {
         title.getStyle().set("text-align", "center");
 
         ComboBox<String> statusFilter = new ComboBox<>("Filtrar por Estado");
+        statusFilter.getStyle().set("cursor", "pointer");
         statusFilter.setItems("TODOS", "EN_PROCESO", "COMPLETADO");
         statusFilter.addValueChangeListener(event -> {
             String status = event.getValue();
@@ -168,6 +175,7 @@ public class DashboardView extends VerticalLayout {
         // Botón para ver detalles
         ordersGrid.addComponentColumn(order -> {
             Button detailsBtn = new Button("Detalles");
+            detailsBtn.getStyle().set("cursor", "pointer");
             detailsBtn.addThemeVariants(ButtonVariant.LUMO_SMALL);
             detailsBtn.addClickListener(e -> showOrderDetails(order));
             return detailsBtn;
@@ -216,6 +224,7 @@ public class DashboardView extends VerticalLayout {
 
         Button addProductBtn = new Button("Añadir Producto");
         addProductBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        addProductBtn.getStyle().set("cursor", "pointer");
         addProductBtn.addClickListener(e -> showAddProductDialog());
 
         // Grid de productos
@@ -232,9 +241,11 @@ public class DashboardView extends VerticalLayout {
             Button editBtn = new Button("Editar");
             editBtn.addThemeVariants(ButtonVariant.LUMO_SMALL);
             editBtn.addClickListener(e -> showEditProductDialog(product, productsGrid));
+            editBtn.getStyle().set("cursor", "pointer");
 
             Button deleteBtn = new Button("Eliminar");
             deleteBtn.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_ERROR);
+            deleteBtn.getStyle().set("cursor", "pointer");
             deleteBtn.addClickListener(e -> {
                 try {
                     productService.removeProduct(product.getId());
@@ -297,8 +308,10 @@ public class DashboardView extends VerticalLayout {
             }
         });
         saveBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveBtn.getStyle().set("cursor", "pointer");
 
         Button cancelBtn = new Button("Cancelar", e -> dialog.close());
+        cancelBtn.getStyle().set("cursor", "pointer");
 
         HorizontalLayout buttons = new HorizontalLayout(saveBtn, cancelBtn);
 
@@ -349,12 +362,14 @@ public class DashboardView extends VerticalLayout {
             }
         });
         saveBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveBtn.getStyle().set("cursor", "pointer");
 
         Button cancelBtn = new Button("Cancelar", e -> dialog.close());
-
+        cancelBtn.getStyle().set("cursor", "pointer");
         HorizontalLayout buttons = new HorizontalLayout(saveBtn, cancelBtn);
 
         VerticalLayout layout = new VerticalLayout(new H3("Añadir Usuario"), formLayout, buttons);
+        layout.getStyle().set("cursor", "pointer");
         dialog.add(layout);
         dialog.open();
     }
@@ -391,8 +406,10 @@ public class DashboardView extends VerticalLayout {
             }
         });
         saveBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveBtn.getStyle().set("cursor", "pointer");
 
         Button cancelBtn = new Button("Cancelar", e -> dialog.close());
+        cancelBtn.getStyle().set("cursor", "pointer");
 
         HorizontalLayout buttons = new HorizontalLayout(saveBtn, cancelBtn);
 
@@ -422,7 +439,6 @@ public class DashboardView extends VerticalLayout {
         // Obtener menús desde el servicio
         List<Menu> menus = dashboardService.getAllMenusWithItems();
         menuGrid.setItems(menus);
-        menuGrid.setHeight("500px");
         menuGrid.setWidthFull();
 
         contentLayout.add(title, info, menuGrid);
@@ -455,6 +471,7 @@ public class DashboardView extends VerticalLayout {
                         }
                     });
                     deleteBtn.addThemeVariants(ButtonVariant.LUMO_ERROR);
+                    deleteBtn.getStyle().set("cursor", "pointer");
 
                     itemLayout.add(deleteBtn);
                     layout.add(itemLayout);
@@ -469,10 +486,12 @@ public class DashboardView extends VerticalLayout {
         // Botón para añadir productos al menú
         Button addProductBtn = new Button("Añadir Producto", e -> showAddProductToMenuDialog(menu, dialog));
         addProductBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        addProductBtn.getStyle().set("cursor", "pointer");
         layout.add(addProductBtn);
 
         Button closeBtn = new Button("Cerrar", e -> dialog.close());
         layout.add(closeBtn);
+        closeBtn.getStyle().set("cursor", "pointer");
 
         dialog.add(layout);
         dialog.open();
@@ -531,9 +550,11 @@ public class DashboardView extends VerticalLayout {
 
             Button editBtn = new Button("Editar");
             editBtn.addThemeVariants(ButtonVariant.LUMO_SMALL);
+            editBtn.getStyle().set("cursor", "pointer");
             editBtn.addClickListener(e -> showNotification("Funcionalidad de editar usuario pendiente", NotificationVariant.LUMO_CONTRAST));
 
             Button deleteBtn = new Button("Eliminar");
+            deleteBtn.getStyle().set("cursor", "pointer");
             deleteBtn.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_ERROR);
             deleteBtn.addClickListener(e -> showNotification("Funcionalidad de eliminar usuario pendiente", NotificationVariant.LUMO_CONTRAST));
 
