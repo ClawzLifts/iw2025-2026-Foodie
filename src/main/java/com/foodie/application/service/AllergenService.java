@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 public class AllergenService {
-    private AllergenRepository allergenRepository;
+    private final AllergenRepository allergenRepository;
 
     public AllergenService(AllergenRepository allergenRepository) {
         this.allergenRepository = allergenRepository;
@@ -25,7 +25,7 @@ public class AllergenService {
     }
 
     @Transactional
-    public Allergen addAllergen(String allergenName) {
+    public Allergen createAllergen(String allergenName) {
         Allergen allergen = new Allergen();
         allergen.setName(allergenName);
 
