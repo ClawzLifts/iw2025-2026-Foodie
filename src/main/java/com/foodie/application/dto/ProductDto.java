@@ -1,18 +1,17 @@
 package com.foodie.application.dto;
 
+import com.foodie.application.domain.Allergen;
 import com.foodie.application.domain.Product;
-import lombok.*;
+import lombok.Value;
 
 import java.io.Serializable;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * DTO for {@link Product}
  */
 @Value
-@Data
-@AllArgsConstructor
-@Builder
 public class ProductDto implements Serializable {
     Integer id;
     String name;
@@ -26,7 +25,10 @@ public class ProductDto implements Serializable {
         this.name = product.getName();
         this.price = product.getPrice();
         this.description = product.getDescription();
-        this.allergens = product.getAllergens();
+        Set<Allergen> allergenSet = product.getAllergens();
+        this.allergens = allergenSet == null ? Set.of() : allergenSet.stream()
+                .map(Allergen::getName)
+                .collect(Collectors.toSet());
         this.imageUrl = product.getImageUrl();
     }
 }
