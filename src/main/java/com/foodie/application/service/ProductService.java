@@ -1,6 +1,7 @@
 package com.foodie.application.service;
 
 import com.foodie.application.domain.Product;
+import com.foodie.application.repository.AllergenRepository;
 import com.foodie.application.repository.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -11,9 +12,11 @@ import java.util.List;
 @Service
 public class ProductService {
 
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
+    private final AllergenRepository allergenRepository;
 
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository, AllergenRepository allergenRepository) {
+        this.allergenRepository = allergenRepository;
         this.productRepository = productRepository;
     }
 
@@ -54,14 +57,18 @@ public class ProductService {
     public void addProductAllergens(Integer productId, java.util.Set<String> newAllergens) {
         var product = productRepository.findById(productId)
                 .orElseThrow(() -> new EntityNotFoundException("Product not found with id: " + productId));
-        product.getAllergens().addAll(newAllergens);
+        var allergens = allergenRepository.findByNameIn(newAllergens);
+
+        product.getAllergens().addAll(allergens);
     }
 
     @Transactional
     public void removeProductAllergens(Integer productId, java.util.Set<String> allergensToRemove) {
         var product = productRepository.findById(productId)
                 .orElseThrow(() -> new EntityNotFoundException("Product not found with id: " + productId));
-        product.getAllergens().removeAll(allergensToRemove);
+        var allergens = allergenRepository.findByNameIn(allergensToRemove);
+
+        product.getAllergens().removeAll(allergens);
     }
 
     public List<Product> getProducts(int i) {
