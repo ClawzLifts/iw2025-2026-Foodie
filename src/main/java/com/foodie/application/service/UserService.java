@@ -73,4 +73,9 @@ public class UserService {
         user.setEmail(email);
         return userRepository.save(user);
     }
+
+    public long countUsers() {
+        return userRepository.count();
+    }
+
 }

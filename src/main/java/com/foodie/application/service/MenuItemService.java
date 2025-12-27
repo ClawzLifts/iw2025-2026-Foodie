@@ -30,17 +30,13 @@ public class MenuItemService {
         return menuItemRepository.save(menuItem);
     }
 
-    public List<MenuItem> getMenuItems(Integer menuId) {
-        return menuItemRepository.findByMenuId(menuId);
+    @Transactional
+    public void deleteById(Integer menuItemId) {
+        menuItemRepository.deleteMenuItemById(menuItemId);
     }
 
-    @Transactional
-    public void deleteMenuItem(Integer menuId, Integer productId) {
-        List<MenuItem> menuItems = menuItemRepository.findByMenuId(menuId);
-        menuItems.stream()
-                .filter(item -> item.getProduct().getId().equals(productId))
-                .findFirst()
-                .ifPresent(menuItemRepository::delete);
+    public java.util.List<MenuItem> getMenuItems(Integer menuId) {
+        return menuItemRepository.findByMenuId(menuId);
     }
 
 }

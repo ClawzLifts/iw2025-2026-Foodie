@@ -3,6 +3,7 @@ package com.foodie.application.service;
 
 import com.foodie.application.domain.Order;
 import com.foodie.application.domain.ProductList;
+import com.foodie.application.domain.User;
 import com.foodie.application.dto.ProductListDto;
 import com.foodie.application.repository.OrderRepository;
 import com.foodie.application.repository.UserRepository;
@@ -10,6 +11,8 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -113,5 +116,25 @@ public class OrderService {
         if (order.getItems() != null && !order.getItems().isEmpty()){
             order.getItems().clear();
         }
+    }
+
+    @Transactional
+    public List<Order> getAllOrders() {
+        return orderRepository.findAll();
+    }
+
+    @Transactional
+    public List<Order> getOrdersByStatus(String status) {
+        if (status == null || status.isBlank() || "ALL".equalsIgnoreCase(status)) {
+            return getAllOrders();
+        }
+        String normalized = status.trim();
+        return orderRepository.findAll().stream()
+                .filter(o -> o.getStatus() != null && o.getStatus().equalsIgnoreCase(normalized))
+                .collect(Collectors.toList());
+    }
+    public List<Order> getOrdersByUser(Integer userId) {
+        Optional<User> user = userRepository.findById(userId);
+        return user.map(orderRepository::findByUser).orElse(List.of());
     }
 }
