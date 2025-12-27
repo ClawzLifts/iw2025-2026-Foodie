@@ -6,7 +6,9 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
 
 @Entity
 @Data
@@ -31,4 +33,13 @@ public class Order {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="payment_id")
     private Payment payment;
+
+    @Column(nullable = false)
+    private Date date;
+
+    @Column(nullable = false)
+    private OrderStatus status;
+
+
+
 }
