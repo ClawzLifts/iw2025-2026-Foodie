@@ -25,6 +25,12 @@ public class RoleService {
     }
 
     @Transactional
+    public Role findOrCreateRole(String name) {
+        return roleRepository.findByName(name)
+                .orElseGet(() -> roleRepository.save(Role.builder().name(name).build()));
+    }
+
+    @Transactional
     public Role addRole(String roleName) {
         Role role = new Role();
         role.setName(roleName);

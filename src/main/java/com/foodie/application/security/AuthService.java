@@ -2,6 +2,7 @@ package com.foodie.application.security;
 
 import com.foodie.application.domain.User;
 import com.foodie.application.repository.UserRepository;
+import com.foodie.application.service.RoleService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -13,10 +14,12 @@ public class AuthService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RoleService roleService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleService roleService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.roleService = roleService;
     }
 
     @Override
@@ -29,7 +32,7 @@ public class AuthService implements UserDetailsService {
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())
-                .roles(user.getRole()) // ADMIN, CLIENTE, etc.
+                .roles(user.getRole().getName()) // ADMIN, CLIENTE, etc.
                 .build();
     }
 
@@ -38,7 +41,7 @@ public class AuthService implements UserDetailsService {
                 .username(username)
                 .password(passwordEncoder.encode(password))
                 .email(email)
-                .role(role)
+                .role(roleService.findOrCreateRole(role))
                 .build();
 
         return userRepository.save(newUser);
