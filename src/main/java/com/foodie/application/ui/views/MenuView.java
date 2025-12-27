@@ -1,6 +1,7 @@
-package com.foodie.application.ui;
+package com.foodie.application.ui.views;
 
 import com.foodie.application.dto.MenuDto;
+import com.foodie.application.ui.MainLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
