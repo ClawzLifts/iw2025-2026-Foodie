@@ -31,7 +31,13 @@ public class Product {
 
     private String imageUrl;
 
-    private Set<String> allergens;
+    @ManyToMany
+    @JoinTable(
+            name = "product_allergen",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "allergen_id")
+    )
+    private Set<Allergen> allergens;
 
     public ProductDto toDto(){
         return new ProductDto(this);
