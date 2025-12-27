@@ -7,6 +7,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class AllergenService {
@@ -22,6 +24,17 @@ public class AllergenService {
 
     public Allergen getAllergenById(Integer id) {
         return allergenRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Allergen not found with id: " + id));
+    }
+
+    @Transactional
+    public Set<Allergen> findOrCreateByNames(Set<String> names) {
+        if (names == null || names.isEmpty()) {
+            return Set.of();
+        }
+        return names.stream()
+                .map(name -> allergenRepository.findByName(name)
+                        .orElseGet(() -> allergenRepository.save(Allergen.builder().name(name).build())))
+                .collect(Collectors.toSet());
     }
 
     @Transactional
