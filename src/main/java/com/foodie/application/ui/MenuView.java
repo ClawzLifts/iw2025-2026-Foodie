@@ -13,6 +13,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 
 import com.foodie.application.dto.ProductDto;
 import com.foodie.application.service.MenuService;
+import com.foodie.application.service.CartService;
 
 import java.util.List;
 
@@ -22,9 +23,11 @@ import java.util.List;
 public class MenuView extends HorizontalLayout {
 
     private final MenuService menuService;
+    private final CartService cartService;
 
-    public MenuView(MenuService menuService) {
+    public MenuView(MenuService menuService, CartService cartService) {
         this.menuService = menuService;
+        this.cartService = cartService;
 
         List<MenuDto> menus = menuService.getMenus();
 
@@ -142,7 +145,23 @@ public class MenuView extends HorizontalLayout {
     }
 
     private void addToCart(ProductDto product) {
-        System.out.println("Añadido al carrito: " + product.getName());
+        cartService.addToCart(
+                product.getId(),
+                product.getName(),
+                product.getPrice(),
+                1
+        );
+
+        // Refresh the cart display in the header
+        getUI().ifPresent(ui -> {
+            MainLayout layout = (MainLayout) ui.getChildren()
+                    .filter(c -> c instanceof MainLayout)
+                    .findFirst()
+                    .orElse(null);
+            if (layout != null) {
+                layout.refreshCart();
+            }
+        });
     }
 
     private void filterByCategory(String category) {
