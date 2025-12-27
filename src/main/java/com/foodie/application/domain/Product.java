@@ -39,6 +39,14 @@ public class Product {
     )
     private Set<Allergen> allergens;
 
+    @ManyToMany
+    @JoinTable(
+            name = "product_ingredient",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "ingredient_id")
+    )
+    private Set<Ingredient> ingredients;
+
     public ProductDto toDto(){
         return new ProductDto(this);
     }
