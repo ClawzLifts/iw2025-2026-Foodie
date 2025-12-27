@@ -176,7 +176,7 @@ public class ShoppingCartComponent extends Div {
             Button checkoutButton = new Button("Comprar", e -> {
                 cartDialog.close();
                 // Navigate to checkout
-                // getUI().ifPresent(ui -> ui.navigate("checkout"));
+                getUI().ifPresent(ui -> ui.navigate("checkout"));
             });
             checkoutButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
             checkoutButton.setWidth("48%");

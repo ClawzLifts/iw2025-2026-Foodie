@@ -7,6 +7,8 @@ import com.foodie.application.repository.RoleRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -332,6 +334,22 @@ public class UserService {
      */
     public long getUserCount() {
         return userRepository.count();
+    }
+
+    /**
+     * Retrieves the currently authenticated user.
+     *
+     * @return the User object of the currently authenticated user, or null if not authenticated
+     */
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+
+        String username = authentication.getName();
+        return userRepository.findByUsername(username).orElse(null);
     }
 }
 

@@ -6,7 +6,7 @@ import com.foodie.application.domain.ProductList;
 import lombok.Value;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -17,7 +17,7 @@ public class OrderDto implements Serializable {
     Integer id;
     UserEntityDto user;
     List<List<ProductList>> items;
-    Date date;
+    LocalDate date;
     OrderStatus status;
 
     public OrderDto(Order order){

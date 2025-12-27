@@ -11,6 +11,8 @@ import com.foodie.application.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -69,6 +71,8 @@ public class OrderService {
                         .build()
         ).toList();
         newOrder.setItems(productList);
+        newOrder.setDate(LocalDate.now());
+        newOrder.setStatus(OrderStatus.valueOf("PENDING"));
         newOrder = orderRepository.save(newOrder);
         newOrder.setPayment(paymentService.createPayment(newOrder, paymentMethod));
 
