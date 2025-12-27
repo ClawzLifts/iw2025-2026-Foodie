@@ -396,7 +396,18 @@ public class OrderService {
         return orderRepository.findByStatusAndDateRange(status, startDate, endDate);
     }
 
-
-
-
+    /**
+     * Updates the status of an order.
+     *
+     * @param orderID the ID of the order to update
+     * @param newStatus the new OrderStatus to set
+     * @throws EntityNotFoundException if the order is not found
+     */
+    @Transactional
+    public void updateOrder(Integer orderID, OrderStatus newStatus) {
+        Order order = orderRepository.findById(orderID)
+                .orElseThrow(() -> new EntityNotFoundException("Order not found with id: " + orderID));
+        order.setStatus(newStatus);
+        orderRepository.save(order);
+    }
 }

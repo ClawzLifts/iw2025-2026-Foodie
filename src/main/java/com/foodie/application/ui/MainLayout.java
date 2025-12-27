@@ -12,11 +12,13 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import com.foodie.application.service.CartService;
 import com.foodie.application.service.UserService;
 import com.foodie.application.ui.components.ShoppingCartComponent;
+import com.foodie.application.ui.views.MainView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,13 +41,17 @@ public class MainLayout extends AppLayout {
     private void createHeader() {
         DrawerToggle toggle = new DrawerToggle();
 
-        H1 title = new H1("Foodie 🍔");
+        // Create a RouterLink for the title that navigates to the landing page
+        RouterLink titleLink = new RouterLink("Foodie 🍔", MainView.class);
+        H1 title = new H1(titleLink);
         title.addClassNames(
                 LumoUtility.FontSize.LARGE,
                 LumoUtility.Margin.MEDIUM
         );
+        // Remove underline from link
+        titleLink.getStyle().set("text-decoration", "none").set("color", "inherit");
 
-        // Create shopping cart component
+        // Create shopping cart component before using it
         shoppingCart = new ShoppingCartComponent(cartService);
 
         HorizontalLayout header = new HorizontalLayout(toggle, title);

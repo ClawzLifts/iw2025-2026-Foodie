@@ -370,10 +370,8 @@ public class MyOrdersView extends VerticalLayout {
 
         cancelDialog.addConfirmListener(e -> {
             try {
-                // Update order status to CANCELLED
-                order.setStatus(OrderStatus.CANCELLED);
-                // Note: You might need to create an updateOrder method in OrderService
-                // For now, this is a placeholder - you'll need to implement the actual cancellation logic
+                // Update order status to CANCELLED using OrderService
+                orderService.updateOrder(order.getId(), OrderStatus.CANCELLED);
 
                 Notification.show("Pedido cancelado exitosamente")
                         .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
