@@ -201,7 +201,10 @@ public class ShoppingCartComponent extends Div {
                 .set("border-radius", "4px")
                 .set("display", "flex")
                 .set("justify-content", "space-between")
-                .set("align-items", "center");
+                .set("align-items", "center")
+                .set("width", "100%")
+                .set("box-sizing", "border-box")
+                .set("gap", "8px");
 
         // Item info
         Div infoDiv = new Div();
@@ -213,13 +216,46 @@ public class ShoppingCartComponent extends Div {
         Span nameSpan = new Span(item.getProductName());
         nameSpan.getStyle().set("font-weight", "500");
 
-        Span quantityPrice = new Span(
-                String.format("%d x €%.2f", item.getQuantity(), item.getPrice())
-        );
-        quantityPrice.addClassNames(LumoUtility.TextColor.SECONDARY);
-        quantityPrice.getStyle().set("font-size", "13px");
+        Span priceSpan = new Span(String.format("€%.2f", item.getPrice()));
+        priceSpan.addClassNames(LumoUtility.TextColor.SECONDARY);
+        priceSpan.getStyle().set("font-size", "13px");
 
-        infoDiv.add(nameSpan, quantityPrice);
+        infoDiv.add(nameSpan, priceSpan);
+
+        // Quantity controls
+        Div quantityDiv = new Div();
+        quantityDiv.getStyle()
+                .set("display", "flex")
+                .set("align-items", "center")
+                .set("gap", "4px");
+
+        Button decreaseBtn = new Button("-");
+        decreaseBtn.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY);
+        decreaseBtn.getStyle().set("min-width", "32px");
+        decreaseBtn.addClickListener(e -> {
+            if (item.getQuantity() > 1) {
+                item.setQuantity(item.getQuantity() - 1);
+                cartService.updateCartItemQuantity(item.getProductId(), item.getQuantity());
+                updateCartDisplay();
+            } else {
+                cartService.removeFromCart(item.getProductId());
+                updateCartDisplay();
+            }
+        });
+
+        Span quantitySpan = new Span(String.valueOf(item.getQuantity()));
+        quantitySpan.getStyle().set("min-width", "24px").set("text-align", "center");
+
+        Button increaseBtn = new Button("+");
+        increaseBtn.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY);
+        increaseBtn.getStyle().set("min-width", "32px");
+        increaseBtn.addClickListener(e -> {
+            item.setQuantity(item.getQuantity() + 1);
+            cartService.updateCartItemQuantity(item.getProductId(), item.getQuantity());
+            updateCartDisplay();
+        });
+
+        quantityDiv.add(decreaseBtn, quantitySpan, increaseBtn);
 
         // Remove button
         Button removeButton = new Button(new Icon(VaadinIcon.TRASH));
@@ -230,7 +266,7 @@ public class ShoppingCartComponent extends Div {
             updateCartDisplay();
         });
 
-        itemDiv.add(infoDiv, removeButton);
+        itemDiv.add(infoDiv, quantityDiv, removeButton);
         return itemDiv;
     }
 

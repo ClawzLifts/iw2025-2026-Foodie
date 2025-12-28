@@ -46,7 +46,9 @@ public class CheckoutView extends VerticalLayout implements BeforeEnterObserver 
     private Grid<ProductList> cartGrid;
     private Div totalPriceDiv;
     private ComboBox<PaymentMethod> paymentMethodCombo;
+    private ComboBox<String> deliveryTypeCombo;
     private TextField addressField;
+    private H4 addressTitle;
     private TextArea notesField;
     private Button proceedButton;
 
@@ -215,13 +217,30 @@ public class CheckoutView extends VerticalLayout implements BeforeEnterObserver 
         totalValue = new Span("0.00 €");
         totalPriceDiv.add(totalLabel, totalValue);
 
+        // Delivery Type
+        H4 deliveryTitle = new H4("Tipo de Entrega");
+        deliveryTitle.addClassNames(LumoUtility.Margin.Top.LARGE, LumoUtility.Margin.Bottom.SMALL);
+
+        deliveryTypeCombo = new ComboBox<>("Selecciona tipo de entrega");
+        deliveryTypeCombo.setItems("Recoger/Mesa", "A Domicilio");
+        deliveryTypeCombo.setWidthFull();
+        deliveryTypeCombo.setRequiredIndicatorVisible(true);
+        deliveryTypeCombo.addValueChangeListener(e -> {
+            boolean isDelivery = "A Domicilio".equals(e.getValue());
+            addressTitle.setVisible(isDelivery);
+            addressField.setVisible(isDelivery);
+        });
+        deliveryTypeCombo.addClassNames(LumoUtility.Margin.Bottom.MEDIUM);
+
         // Delivery Address
-        H4 addressTitle = new H4("Dirección de Entrega");
+        addressTitle = new H4("Dirección de Entrega");
         addressTitle.addClassNames(LumoUtility.Margin.Top.LARGE, LumoUtility.Margin.Bottom.SMALL);
+        addressTitle.setVisible(false);
 
         addressField = new TextField();
         addressField.setPlaceholder("Calle, número y piso");
         addressField.setWidthFull();
+        addressField.setVisible(false);
         addressField.addClassNames(LumoUtility.Margin.Bottom.MEDIUM);
 
         // Notes
@@ -275,6 +294,8 @@ public class CheckoutView extends VerticalLayout implements BeforeEnterObserver 
                 summaryContainer,
                 totalPriceDiv,
                 new Hr(),
+                new H4("Opciones de Entrega"),
+                deliveryTypeCombo,
                 addressTitle,
                 addressField,
                 notesTitle,
@@ -341,8 +362,15 @@ public class CheckoutView extends VerticalLayout implements BeforeEnterObserver 
      * Completes the order and processes payment
      */
     private void completeOrder() {
-        // Validate inputs
-        if (addressField.isEmpty()) {
+        // Validate delivery type
+        if (deliveryTypeCombo.isEmpty()) {
+            Notification.show("Por favor, selecciona un tipo de entrega")
+                    .addThemeVariants(NotificationVariant.LUMO_WARNING);
+            return;
+        }
+
+        // Validate address only if delivery type is "A Domicilio"
+        if ("A Domicilio".equals(deliveryTypeCombo.getValue()) && addressField.isEmpty()) {
             Notification.show("Por favor, ingresa una dirección de entrega")
                     .addThemeVariants(NotificationVariant.LUMO_WARNING);
             return;
