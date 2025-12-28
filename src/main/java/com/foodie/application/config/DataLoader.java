@@ -1,8 +1,10 @@
 package com.foodie.application.config;
 
+import com.foodie.application.domain.Establishment;
 import com.foodie.application.domain.Menu;
 import com.foodie.application.domain.MenuItem;
 import com.foodie.application.domain.Product;
+import com.foodie.application.repository.EstablishmentRepository;
 import com.foodie.application.repository.MenuItemRepository;
 import com.foodie.application.repository.MenuRepository;
 import com.foodie.application.repository.ProductRepository;
@@ -12,6 +14,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -21,7 +24,8 @@ public class DataLoader {
 
     @Bean
     CommandLineRunner loadData(ProductRepository productRepository, MenuRepository menuRepository,
-                               MenuItemRepository menuItemRepository, AllergenService allergenService,
+                               MenuItemRepository menuItemRepository, EstablishmentRepository establishmentRepository,
+                               AllergenService allergenService,
                                IngredientService ingredientService) {
         return args -> {
             if (productRepository.count() == 0) { // evita duplicados al reiniciar
@@ -188,7 +192,7 @@ public class DataLoader {
 
 
                 System.out.println("✅ Productos de prueba añadidos correctamente.");
-        };
+            };
             if (menuRepository.count() == 0) {
                 Menu menu = new Menu();
                 menu.setName("Menu Estudiante");
@@ -223,6 +227,19 @@ public class DataLoader {
                                 ));
 
                 menuRepository.save(menu2);
+            }
+
+            if (establishmentRepository.count() == 0) {
+                var establishment = Establishment.builder()
+                        .name("Bar Casa Manteca")
+                        .description("El Bar Casa Manteca es un lugar emblemático donde se fusiona la tradición " +
+                                "culinaria con un ambiente acogedor.")
+                        .address("Calle de los Gaitanes, 15, 29017 Málaga, España")
+                        .phone("+34 952 22 34 56")
+                        .openingTime(LocalTime.of(9, 0))
+                        .closingTime(LocalTime.of(22, 0)).build();
+
+                establishmentRepository.save(establishment);
             }
         };
 
