@@ -2,22 +2,26 @@ package com.foodie.application.service;
 
 import com.foodie.application.domain.Product;
 import com.foodie.application.repository.AllergenRepository;
+import com.foodie.application.repository.IngredientRepository;
 import com.foodie.application.repository.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class ProductService {
 
     private final ProductRepository productRepository;
     private final AllergenRepository allergenRepository;
+    private final IngredientRepository ingredientRepository;
 
-    public ProductService(ProductRepository productRepository, AllergenRepository allergenRepository) {
+    public ProductService(ProductRepository productRepository, AllergenRepository allergenRepository, IngredientRepository ingredientRepository) {
         this.allergenRepository = allergenRepository;
         this.productRepository = productRepository;
+        this.ingredientRepository = ingredientRepository;
     }
 
     @Transactional
@@ -51,6 +55,24 @@ public class ProductService {
         var product = productRepository.findById(productId)
                 .orElseThrow(() -> new EntityNotFoundException("Product not found with id: " + productId));
         product.setName(newName);
+    }
+
+    @Transactional
+    public void addProductIngredients(Integer productId, Set<String> newIngredients) {
+        var product = productRepository.findById(productId)
+                .orElseThrow(() -> new EntityNotFoundException("Product not found with id: " + productId));
+        var ingredients = ingredientRepository.findByNameIn(newIngredients);
+
+        product.getIngredients().addAll(ingredients);
+    }
+
+    @Transactional
+    public void removeProductIngredients(Integer productId, Set<String> ingredientsToRemove) {
+        var product = productRepository.findById(productId)
+                .orElseThrow(() -> new EntityNotFoundException("Product not found with id: " + productId));
+        var ingredients = ingredientRepository.findByNameIn(ingredientsToRemove);
+
+        product.getIngredients().removeAll(ingredients);
     }
 
     @Transactional
