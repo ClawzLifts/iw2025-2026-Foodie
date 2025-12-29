@@ -47,7 +47,9 @@ public class User {
     private String fullName;
     private Set<String> allergies;
 
-    private String role;
+    @ManyToOne
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
 
     @JsonIgnore
     @OneToMany
