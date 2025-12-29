@@ -44,6 +44,7 @@ jobs:
           fail-on-error: false
 
   security-scan:
+    if: ${{ github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     needs: build-and-test
 
