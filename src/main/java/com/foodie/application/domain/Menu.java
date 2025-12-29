@@ -20,7 +20,7 @@ public class Menu {
     private Integer id;
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "menu")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "menu", fetch = FetchType.EAGER)
     private List<MenuItem> menuItems;
 
     public MenuDto toDto(){

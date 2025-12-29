@@ -58,7 +58,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
                 .set("background-repeat", "no-repeat");
     }
 
-    // ✅ Este método se ejecuta automáticamente cuando se navega a esta vista
+    // Este método se ejecuta automáticamente cuando se navega a esta vista
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
         Location location = event.getLocation();
@@ -71,6 +71,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         // También puedes verificar logout
         if (queryParameters.getParameters().containsKey("logout")) {
             // Mostrar mensaje de logout exitoso si quieres
+
         }
     }
 
