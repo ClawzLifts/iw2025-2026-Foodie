@@ -10,7 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Check;
 
 /**
  * Represents a user entity in the Foodie application.
@@ -28,7 +27,6 @@ import org.hibernate.annotations.Check;
 @AllArgsConstructor
 @Data
 @Table(name = "users")
-@Check(constraints = "role IN ('USER', 'MANAGER', 'ADMIN')")
 public class User {
 
     @Id
@@ -50,6 +48,7 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
+
 
     @JsonIgnore
     @OneToMany

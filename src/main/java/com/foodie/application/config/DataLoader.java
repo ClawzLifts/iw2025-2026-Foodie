@@ -3,9 +3,11 @@ package com.foodie.application.config;
 import com.foodie.application.domain.Menu;
 import com.foodie.application.domain.MenuItem;
 import com.foodie.application.domain.Product;
+import com.foodie.application.domain.Role;
 import com.foodie.application.repository.MenuItemRepository;
 import com.foodie.application.repository.MenuRepository;
 import com.foodie.application.repository.ProductRepository;
+import com.foodie.application.repository.RoleRepository;
 import com.foodie.application.service.AllergenService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -20,8 +22,15 @@ public class DataLoader {
 
     @Bean
     CommandLineRunner loadData(ProductRepository productRepository, MenuRepository menuRepository,
-                               MenuItemRepository menuItemRepository, AllergenService allergenService) {
+                               MenuItemRepository menuItemRepository, AllergenService allergenService, RoleRepository roleRepository) {
         return args -> {
+            // Insert default roles if not present
+            if (roleRepository.count() == 0) {
+                roleRepository.save(Role.builder().name("USER").build());
+                roleRepository.save(Role.builder().name("MANAGER").build());
+                roleRepository.save(Role.builder().name("ADMIN").build());
+            }
+
             if (productRepository.count() == 0) { // evita duplicados al reiniciar
                 productRepository.save(Product.builder()
                         .name("Hamburguesa Clásica")
@@ -169,7 +178,7 @@ public class DataLoader {
 
 
                 System.out.println("✅ Productos de prueba añadidos correctamente.");
-        };
+            }
             if (menuRepository.count() == 0) {
                 Menu menu = new Menu();
                 menu.setName("Menu Estudiante");

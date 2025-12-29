@@ -26,4 +26,12 @@ public class MenuItem {
 
     private Boolean featured;
     private Integer discountPercentage;
+
+    public String getName() {
+        return product != null ? product.getName() : "Sin nombre";
+    }
+
+    public Double getPrice() {
+        return product != null ? product.getPrice() : 0.0;
+    }
 }

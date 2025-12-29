@@ -1,9 +1,7 @@
 package com.foodie.application.service;
 
 import com.foodie.application.domain.Menu;
-import com.foodie.application.domain.MenuItem;
 import com.foodie.application.dto.MenuDto;
-import com.foodie.application.dto.MenuItemDto;
 import com.foodie.application.dto.ProductDto;
 import com.foodie.application.repository.MenuRepository;
 import jakarta.transaction.Transactional;
@@ -41,34 +39,35 @@ public class MenuService {
     }
 
     @Transactional
-    public Integer addMenu(String name, List<MenuItemDto> items) {
-        Menu menu = new Menu();
-        menu.setName(name);
-
-        Menu savedMenu = menuRepository.save(menu);
-        List<MenuItem> menuItems = items.stream().map(itemDto ->
-                menuItemService.addMenuItem(
-                        itemDto.getProductId(),
-                        savedMenu,
-                        itemDto.getFeatured(),
-                        itemDto.getDiscountPercentage()
-                )
-        ).toList();
-
-        savedMenu.setMenuItems(menuItems);
-        return savedMenu.getId();
-    }
-
-    @Transactional
     public Integer deleteMenu(Integer menuId) {
         Menu menu = menuRepository.findById(menuId).orElseThrow();
         menuRepository.delete(menu);
         return menuId;
     }
 
+    public List<Menu> getAllMenus() {
+        return menuRepository.findAll();
+    }
+
     @Transactional
-    public void updateMenuName(Integer menuId, String newName) {
-        Menu menu = menuRepository.findById(menuId).orElseThrow();
-        menu.setName(newName);
+    public List<Menu> getAllMenusWithItems() {
+        List<Menu> menus = menuRepository.findAll();
+        menus.forEach(menu -> {
+            if (menu.getMenuItems() != null) {
+                menu.getMenuItems().size();
+            }
+        });
+        return menus;
+    }
+
+    @Transactional
+    public void addProductToMenu(Integer menuId, Integer productId) {
+        Menu menu = menuRepository.findById(menuId).orElseThrow(() -> new IllegalArgumentException("Menu no encontrado con ID: " + menuId));
+        menuItemService.addMenuItem(productId, menu, false, 0);
+    }
+
+    @Transactional
+    public void deleteMenuItem(Integer menuItemId) {
+        menuItemService.deleteById(menuItemId);
     }
 }

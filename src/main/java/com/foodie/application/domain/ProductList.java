@@ -1,6 +1,4 @@
 package com.foodie.application.domain;
-
-import jakarta.persistence.Entity;
 import lombok.*;
 
 /**
@@ -15,16 +13,16 @@ import lombok.*;
  * @version 1.0
  * @since 2024
  */
+
+import lombok.*;
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductList {
-
     private Integer productId;
     private String productName;
     private Double price;
-
     private Integer quantity;
-
 }
