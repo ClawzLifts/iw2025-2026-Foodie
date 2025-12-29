@@ -25,7 +25,7 @@ public class SecurityConfig {
                                 "/favicon.ico", "/robots.txt", "/manifest.webmanifest", "/sw.js",
                                 "/offline.html", "/icons/**", "/images/**", "/styles/**"
                         ).permitAll()
-                        .requestMatchers("/dashboard/**").hasRole("MANAGER")
+                        .requestMatchers("/dashboard/**").hasRole("ADMIN")
                         .requestMatchers("/carta/**", "/carrito/**", "/pago/**", "/foodmenu").hasRole("USER")
                         .anyRequest().authenticated()
                 )

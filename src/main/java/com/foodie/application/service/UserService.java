@@ -33,6 +33,9 @@ public class UserService {
         if (userRepository.findByUsername(username).isPresent()) {
             throw new RuntimeException("Usuario ya existe");
         }
+        if (role != null && !role.equals("USER") && !role.equals("ADMIN")) {
+            throw new RuntimeException("Solo se permiten roles USER o ADMIN");
+        }
         User user = User.builder()
                 .username(username)
                 .password(passwordEncoder.encode(rawPassword))
@@ -62,7 +65,10 @@ public class UserService {
     }
 
     public java.util.List<String> getAllRoles() {
-        return roleRepository.findAll().stream().map(Role::getName).toList();
+        return roleRepository.findAll().stream()
+            .map(Role::getName)
+            .filter(r -> r.equals("USER") || r.equals("ADMIN"))
+            .toList();
     }
 
     public void deleteUser(Integer userId) {

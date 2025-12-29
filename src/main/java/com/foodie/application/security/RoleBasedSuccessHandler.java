@@ -14,7 +14,7 @@ public class RoleBasedSuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
         var roles = authentication.getAuthorities();
-        if (roles.stream().anyMatch(r -> r.getAuthority().equals("ROLE_MANAGER"))) {
+        if (roles.stream().anyMatch(r -> r.getAuthority().equals("ROLE_ADMIN"))) {
             response.sendRedirect("/dashboard");
         } else if (roles.stream().anyMatch(r -> r.getAuthority().equals("ROLE_USER"))) {
             response.sendRedirect("/foodmenu");

@@ -4,7 +4,7 @@ permissions:
   contents: write
   checks: write
   security-events: write
-
+  actions: read
 
 on:
   push:

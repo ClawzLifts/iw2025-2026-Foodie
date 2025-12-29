@@ -27,7 +27,6 @@ public class DataLoader {
             // Insert default roles if not present
             if (roleRepository.count() == 0) {
                 roleRepository.save(Role.builder().name("USER").build());
-                roleRepository.save(Role.builder().name("MANAGER").build());
                 roleRepository.save(Role.builder().name("ADMIN").build());
             }
 

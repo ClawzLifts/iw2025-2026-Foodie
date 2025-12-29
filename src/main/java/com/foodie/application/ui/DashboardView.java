@@ -35,8 +35,8 @@ import java.util.stream.Collectors;
 import com.vaadin.flow.component.combobox.ComboBox;
 
 @Route("dashboard")
-@PageTitle("Dashboard Manager | Foodie")
-@RolesAllowed("MANAGER")
+@PageTitle("Dashboard Admin | Foodie")
+@RolesAllowed("ADMIN")
 public class DashboardView extends VerticalLayout {
 
     private final ProductService productService;
@@ -60,7 +60,7 @@ public class DashboardView extends VerticalLayout {
         setSizeFull();
         setPadding(true);
 
-        H2 titulo = new H2("Panel de Manager");
+        H2 titulo = new H2("Panel de Admin");
         titulo.getStyle().set("margin-bottom", "20px");
         titulo.getStyle().set("text-align", "center");
 
