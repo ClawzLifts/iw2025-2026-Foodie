@@ -1,5 +1,11 @@
 name: CI Pipeline
 
+permissions:
+  contents: write
+  checks: write
+  security-events: write
+
+
 on:
   push:
     branches: [main, testing]
@@ -62,7 +68,7 @@ jobs:
 
       - name: Subir resultados a GitHub Security
         uses: github/codeql-action/upload-sarif@v3
-        if: always()
+        if: ${{ always() && github.event_name != 'pull_request' }}
         with:
           sarif_file: "trivy-results.sarif"
 
