@@ -17,7 +17,6 @@ import com.foodie.application.service.MenuService;
 import java.util.List;
 
 @PageTitle("Menu")
-@AnonymousAllowed
 @Route(value = "foodmenu", layout = MainLayout.class)
 public class MenuView extends HorizontalLayout {
 

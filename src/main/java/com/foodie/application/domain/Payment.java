@@ -14,14 +14,14 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @JoinColumn(name="order_id")
-    @OneToOne (mappedBy = "payment")
+    @OneToOne(mappedBy = "payment")
     private Order order;
 
     private Double paymentAmount;
 
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
+
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
 }
