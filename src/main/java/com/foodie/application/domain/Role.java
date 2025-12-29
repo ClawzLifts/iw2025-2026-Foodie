@@ -19,4 +19,9 @@ public class Role {
 
     @Column(nullable = false, unique = true)
     private String name;
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

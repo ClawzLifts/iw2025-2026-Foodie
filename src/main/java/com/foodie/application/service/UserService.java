@@ -1,6 +1,8 @@
 package com.foodie.application.service;
 
+import com.foodie.application.domain.Role;
 import com.foodie.application.domain.User;
+import com.foodie.application.repository.RoleRepository;
 import com.foodie.application.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,11 +15,14 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
 
     public UserService(UserRepository userRepository,
-                       PasswordEncoder passwordEncoder) {
+                       PasswordEncoder passwordEncoder,
+                       RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.roleRepository = roleRepository;
     }
 
     public Optional<User> findByUsername(String username) {
@@ -32,7 +37,8 @@ public class UserService {
                 .username(username)
                 .password(passwordEncoder.encode(rawPassword))
                 .email(email)
-                .role(role != null ? role : "USER")
+                .role(role != null ? roleRepository.findByName(role).orElseThrow(() -> new RuntimeException("Role not found"))
+                                   : roleRepository.findByName("USER").orElseThrow(() -> new RuntimeException("Role USER not found")))
                 .build();
         return userRepository.save(user);
     }
@@ -45,7 +51,7 @@ public class UserService {
         User user = User.builder()
                 .username(username)
                 .password(passwordEncoder.encode(rawPassword))
-                .role(role)
+                .role(roleRepository.findByName(role).orElseThrow(() -> new RuntimeException("Role not found")))
                 .email(email)
                 .build();
         return userRepository.save(user);
@@ -56,7 +62,7 @@ public class UserService {
     }
 
     public java.util.List<String> getAllRoles() {
-        return List.of("USER", "MANAGER");
+        return roleRepository.findAll().stream().map(Role::getName).toList();
     }
 
     public void deleteUser(Integer userId) {

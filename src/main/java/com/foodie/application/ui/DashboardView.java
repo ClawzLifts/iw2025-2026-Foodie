@@ -235,6 +235,7 @@ public class DashboardView extends VerticalLayout {
         addProductBtn.getStyle().set("cursor", "pointer");
         addProductBtn.addClickListener(e -> showAddProductDialog());
 
+        List<Product> productos = productService.getAllProducts();
         Grid<Product> productsGrid = new Grid<>(Product.class, false);
         productsGrid.addColumn(Product::getId).setHeader("ID").setWidth("80px");
         productsGrid.addColumn(Product::getName).setHeader("Nombre");
@@ -267,7 +268,7 @@ public class DashboardView extends VerticalLayout {
             return actions;
         }).setHeader("Acciones");
 
-        productsGrid.setItems(productService.getAllProducts());
+        productsGrid.setItems(productos);
         productsGrid.setHeight("500px");
         productsGrid.setWidthFull();
 
@@ -356,8 +357,8 @@ public class DashboardView extends VerticalLayout {
                 }
                 User newUser = userService.registerUser(
                         nameField.getValue(),
-                        emailField.getValue(),
                         passwordField.getValue(),
+                        emailField.getValue(),    // email
                         roleSelector.getValue()
                 );
                 showNotification("Usuario '" + newUser.getUsername() + "' creado correctamente", NotificationVariant.LUMO_SUCCESS);
@@ -543,7 +544,7 @@ public class DashboardView extends VerticalLayout {
         userGrid.removeAllColumns();
         userGrid.addColumn(User::getUsername).setHeader("Usuario");
         userGrid.addColumn(User::getEmail).setHeader("Correo Electrónico");
-        userGrid.addColumn(User::getRole).setHeader("Rol");
+        userGrid.addColumn(user -> user.getRole() != null ? user.getRole().getName() : "").setHeader("Rol");
         userGrid.addComponentColumn(user -> {
             HorizontalLayout actions = new HorizontalLayout();
 

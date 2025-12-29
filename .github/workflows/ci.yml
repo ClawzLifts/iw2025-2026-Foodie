@@ -24,17 +24,8 @@ jobs:
       - name: Dar permisos de ejecución a mvnw
         run: chmod +x mvnw
 
-      - name: Compilar con Maven
-        run: ./mvnw clean compile
-
-      - name: Ejecutar tests
-        run: ./mvnw test
-
-      - name: Generar reporte de cobertura
-        run: ./mvnw verify
-
-      - name: Construir paquete JAR
-        run: ./mvnw package -DskipTests
+      - name: Compilar, testear y verificar con Maven
+        run: ./mvnw clean verify
 
       - name: Subir artefacto JAR
         uses: actions/upload-artifact@v4

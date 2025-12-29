@@ -18,13 +18,14 @@ import java.util.stream.Collectors;
 @Service
 public class ProductService {
 
-    private final final ProductRepository productRepository;
-    private OrderService orderService;
+    private final ProductRepository productRepository;
+    private final OrderService orderService;
     private final AllergenRepository allergenRepository;
 
-    public ProductService(ProductRepository productRepository, AllergenRepository allergenRepository) {
+    public ProductService(ProductRepository productRepository, AllergenRepository allergenRepository, OrderService orderService) {
         this.allergenRepository = allergenRepository;
         this.productRepository = productRepository;
+        this.orderService = orderService;
     }
 
     @Transactional
