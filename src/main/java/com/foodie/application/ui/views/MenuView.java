@@ -1,18 +1,19 @@
 package com.foodie.application.ui.views;
 
 import com.foodie.application.dto.MenuDto;
+import com.foodie.application.dto.MenuItemDisplayDto;
 import com.foodie.application.ui.MainLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
-import com.foodie.application.dto.ProductDto;
 import com.foodie.application.service.MenuService;
 import com.foodie.application.service.CartService;
 
@@ -55,12 +56,11 @@ public class MenuView extends HorizontalLayout {
         sidebar.add(menuTitle);
 
         menus.forEach(menu -> {
-            Button button = new Button(menu.getName(), e -> {
-                getUI().ifPresent(ui -> ui.getPage().executeJs(
+            Button button = new Button(menu.getName());
+            button.addClickListener(e -> getUI().ifPresent(ui -> ui.getPage().executeJs(
                         "document.getElementById($0).scrollIntoView({behavior: 'smooth'});",
                         "menu-" + menu.getId()
-                ));
-            });
+                )));
             sidebar.add(button);
         });
 
@@ -77,7 +77,6 @@ public class MenuView extends HorizontalLayout {
         mainContent.setSpacing(false);
         mainContent.setAlignItems(Alignment.CENTER);
 
-
         if(menus != null && !menus.isEmpty()){
             menus.forEach(menu -> {
 
@@ -90,13 +89,14 @@ public class MenuView extends HorizontalLayout {
                 cardContainer.setFlexWrap(FlexLayout.FlexWrap.WRAP);
                 cardContainer.setJustifyContentMode(FlexLayout.JustifyContentMode.CENTER);
                 cardContainer.setWidthFull();
+                cardContainer.addClassNames(LumoUtility.Gap.MEDIUM);
 
-                List<ProductDto> products = menuService.getProducts(menu.getId());
+                // Usar el nuevo método que devuelve MenuItemDisplayDto con descuentos
+                List<MenuItemDisplayDto> menuItems = menuService.getMenuItemsForDisplay(menu.getId());
 
-                if (products != null) {
-                    for (ProductDto product : products) {
-                        cardContainer.add(createProductCard(product));
-                        cardContainer.addClassNames(LumoUtility.Gap.MEDIUM);
+                if (menuItems != null) {
+                    for (MenuItemDisplayDto item : menuItems) {
+                        cardContainer.add(createProductCard(item));
                     }
                 }
 
@@ -112,31 +112,94 @@ public class MenuView extends HorizontalLayout {
         return mainContent;
     }
 
-    private Div createProductCard(ProductDto product) {
+    /**
+     * Creates a product card component with pricing and featured badge
+     *
+     * @param item the MenuItemDisplayDto containing product information
+     * @return a Div component representing the product card
+     */
+    private Div createProductCard(MenuItemDisplayDto item) {
         Div card = new Div();
         card.addClassName("product-card");
         card.getStyle().set("max-width", "400px")
-                .set("box-shadow", "0 2px 6px rgba(0,0,0,0.1)");
+                .set("box-shadow", "0 2px 6px rgba(0,0,0,0.1)")
+                .set("position", "relative");
 
-        Image image = new Image(product.getImageUrl(), product.getName());
+        // Badge para destacados
+        if (item.getFeatured() != null && item.getFeatured()) {
+            Div badge = new Div("⭐ DESTACADO");
+            badge.getStyle()
+                    .set("position", "absolute")
+                    .set("top", "10px")
+                    .set("right", "10px")
+                    .set("background-color", "#FFD700")
+                    .set("color", "#000")
+                    .set("padding", "5px 10px")
+                    .set("border-radius", "5px")
+                    .set("font-weight", "bold")
+                    .set("font-size", "12px")
+                    .set("z-index", "10");
+            card.add(badge);
+        }
+
+        Image image = new Image(item.getImageUrl(), item.getName());
         image.addClassName("product-image");
         image.getStyle().setWidth("350px").setHeight("350px");
 
-        H1 name = new H1(product.getName());
+        H1 name = new H1(item.getName());
         name.addClassName("product-name");
         name.getStyle().set("text-align", "center").set("font-size", "26px");
 
-        Paragraph desc = new Paragraph(product.getDescription());
+        Paragraph desc = new Paragraph(item.getDescription());
         desc.addClassName("product-description");
 
-        Paragraph price = new Paragraph(String.format("€%.2f", product.getPrice()));
-        price.addClassName("product-price");
-        price.getStyle().set("font-weight", "bold");
+        // Sección de precios
+        HorizontalLayout priceLayout = new HorizontalLayout();
+        priceLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        priceLayout.setSpacing(true);
 
-        Button addButton = new Button("Añadir al carrito", e -> addToCart(product));
+        if (item.getDiscountPercentage() != null && item.getDiscountPercentage() > 0) {
+            // Mostrar precio original tachado
+            Paragraph originalPrice = new Paragraph(String.format("€%.2f", item.getOriginalPrice()));
+            originalPrice.getStyle()
+                    .set("text-decoration", "line-through")
+                    .set("color", "#999")
+                    .set("font-size", "14px")
+                    .set("margin", "0");
+
+            // Mostrar precio con descuento en verde
+            Paragraph discountedPrice = new Paragraph(String.format("€%.2f", item.getDiscountedPrice()));
+            discountedPrice.getStyle()
+                    .set("font-weight", "bold")
+                    .set("color", "#28a745")
+                    .set("font-size", "18px")
+                    .set("margin", "0");
+
+            // Badge de descuento
+            Span discountBadge = new Span(item.getDiscountPercentage() + "% OFF");
+            discountBadge.getStyle()
+                    .set("background-color", "#dc3545")
+                    .set("color", "white")
+                    .set("padding", "3px 8px")
+                    .set("border-radius", "3px")
+                    .set("font-size", "12px")
+                    .set("font-weight", "bold")
+                    .set("margin-left", "10px");
+
+            priceLayout.add(originalPrice, discountedPrice, discountBadge);
+        } else {
+            // Sin descuento, mostrar solo el precio
+            Paragraph price = new Paragraph(String.format("€%.2f", item.getOriginalPrice()));
+            price.addClassName("product-price");
+            price.getStyle().set("font-weight", "bold");
+            priceLayout.add(price);
+        }
+
+        Button addButton = new Button("Añadir al carrito");
+        addButton.addClickListener(e -> addToCart(item));
         addButton.addClassName("add-button");
 
-        VerticalLayout content = new VerticalLayout(name, desc, price, addButton);
+        VerticalLayout content = new VerticalLayout(name, desc, priceLayout, addButton);
         content.setPadding(false);
         content.setSpacing(false);
         content.setAlignItems(Alignment.CENTER);
@@ -145,11 +208,21 @@ public class MenuView extends HorizontalLayout {
         return card;
     }
 
-    private void addToCart(ProductDto product) {
+    /**
+     * Adds a product to the cart with its discounted price if applicable
+     *
+     * @param item the MenuItemDisplayDto to add to cart
+     */
+    private void addToCart(MenuItemDisplayDto item) {
+        // Usar el precio con descuento si existe
+        Double priceToAdd = (item.getDiscountPercentage() != null && item.getDiscountPercentage() > 0)
+                ? item.getDiscountedPrice()
+                : item.getOriginalPrice();
+
         cartService.addToCart(
-                product.getId(),
-                product.getName(),
-                product.getPrice(),
+                item.getProductId(),
+                item.getName(),
+                priceToAdd,
                 1
         );
 
@@ -163,9 +236,5 @@ public class MenuView extends HorizontalLayout {
                 layout.refreshCart();
             }
         });
-    }
-
-    private void filterByCategory(String category) {
-        System.out.println("Filtrando por: " + category);
     }
 }
