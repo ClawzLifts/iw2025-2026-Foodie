@@ -250,6 +250,46 @@ public class OrderManagementComponent extends VerticalLayout {
 
         content.add(infoLayout);
 
+        // Delivery Address Section
+        H3 deliveryTitle = new H3("Dirección de Entrega:");
+        content.add(deliveryTitle);
+
+        VerticalLayout deliveryInfo = new VerticalLayout();
+        deliveryInfo.setPadding(false);
+        deliveryInfo.setSpacing(false);
+        deliveryInfo.addClassName(LumoUtility.Border.ALL);
+        deliveryInfo.addClassName(LumoUtility.Padding.MEDIUM);
+        deliveryInfo.addClassName(LumoUtility.BorderRadius.MEDIUM);
+
+        if (orderDto.getDeliveryAddress() != null && !orderDto.getDeliveryAddress().isEmpty()) {
+            deliveryInfo.add(new Span(orderDto.getDeliveryAddress()));
+        } else {
+            Span emptyAddress = new Span("No especificada");
+            emptyAddress.addClassNames(LumoUtility.TextColor.SECONDARY);
+            deliveryInfo.add(emptyAddress);
+        }
+        content.add(deliveryInfo);
+
+        // Notes Section
+        H3 notesTitle = new H3("Notas Especiales:");
+        content.add(notesTitle);
+
+        VerticalLayout notesInfo = new VerticalLayout();
+        notesInfo.setPadding(false);
+        notesInfo.setSpacing(false);
+        notesInfo.addClassName(LumoUtility.Border.ALL);
+        notesInfo.addClassName(LumoUtility.Padding.MEDIUM);
+        notesInfo.addClassName(LumoUtility.BorderRadius.MEDIUM);
+
+        if (orderDto.getNotes() != null && !orderDto.getNotes().isEmpty()) {
+            notesInfo.add(new Span(orderDto.getNotes()));
+        } else {
+            Span emptyNotes = new Span("Sin notas");
+            emptyNotes.addClassNames(LumoUtility.TextColor.SECONDARY);
+            notesInfo.add(emptyNotes);
+        }
+        content.add(notesInfo);
+
         // Items Grid
         H3 itemsTitle = new H3("Productos:");
         content.add(itemsTitle);

@@ -427,7 +427,9 @@ public class CheckoutView extends VerticalLayout implements BeforeEnterObserver 
                                         item.getQuantity()
                                 ))
                                 .toList(),
-                        paymentMethodCombo.getValue().toString()
+                        paymentMethodCombo.getValue().toString(),
+                        addressField.getValue(),
+                        notesField.getValue()
                 );
 
                 // Clear cart

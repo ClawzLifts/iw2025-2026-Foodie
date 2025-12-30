@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * DTO for displaying order information in the UI.
@@ -28,6 +29,8 @@ public class OrderDto implements Serializable {
     private Double totalAmount;
     private List<ProductListDto> items;
     private PaymentDto payment;
+    private String notes;
+    private String deliveryAddress;
 
     /**
      * Converts an Order entity to OrderDisplayDto
@@ -40,8 +43,10 @@ public class OrderDto implements Serializable {
                 .status(order.getStatus())
                 .items(order.getItems().stream()
                         .map(ProductListDto::fromProductList)
-                        .collect(java.util.stream.Collectors.toList()))
+                        .collect(Collectors.toList()))
                 .payment(order.getPayment() != null ? PaymentDto.fromPayment(order.getPayment()) : null)
+                .notes(order.getNotes())
+                .deliveryAddress(order.getDeliveryAddress())
                 .build();
     }
 }

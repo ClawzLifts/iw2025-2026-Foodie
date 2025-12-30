@@ -59,11 +59,14 @@ public class OrderService {
      * @param userID the ID of the user placing the order
      * @param products the list of products to add to the order
      * @param paymentMethod the payment method to use for this order
+     * @param deliveryAddress the delivery address for the order
+     * @param notes optional notes for the order
      * @return the ID of the newly created order
      * @throws EntityNotFoundException if the user is not found
      */
     @Transactional
-    public Integer addOrder(Integer userID, List<ProductListDto> products, String paymentMethod) {
+    public Integer addOrder(Integer userID, List<ProductListDto> products, String paymentMethod,
+                            String deliveryAddress, String notes) {
         Order newOrder = new Order();
         newOrder.setUser(userRepository.findById(userID).orElseThrow());
         List<ProductList> productList = products.stream().map(productDto ->
@@ -77,10 +80,27 @@ public class OrderService {
         newOrder.setItems(productList);
         newOrder.setDate(LocalDate.now());
         newOrder.setStatus(OrderStatus.valueOf("PENDING"));
+        newOrder.setDeliveryAddress(deliveryAddress);
+        newOrder.setNotes(notes);
         newOrder = orderRepository.save(newOrder);
         newOrder.setPayment(paymentService.createPayment(newOrder, paymentMethod));
 
         return newOrder.getId();
+    }
+
+    /**
+     * Creates a new order for a user with the specified products and payment method.
+     * Overloaded method for backward compatibility.
+     *
+     * @param userID the ID of the user placing the order
+     * @param products the list of products to add to the order
+     * @param paymentMethod the payment method to use for this order
+     * @return the ID of the newly created order
+     * @throws EntityNotFoundException if the user is not found
+     */
+    @Transactional
+    public Integer addOrder(Integer userID, List<ProductListDto> products, String paymentMethod) {
+        return addOrder(userID, products, paymentMethod, "", null);
     }
 
 
@@ -412,6 +432,53 @@ public class OrderService {
         Order order = orderRepository.findById(orderID)
                 .orElseThrow(() -> new EntityNotFoundException("Order not found with id: " + orderID));
         order.setStatus(newStatus);
+        orderRepository.save(order);
+    }
+
+    /**
+     * Updates the notes and delivery address of an order.
+     *
+     * @param orderID the ID of the order to update
+     * @param notes the new notes for the order
+     * @param deliveryAddress the new delivery address for the order
+     * @throws EntityNotFoundException if the order is not found
+     */
+    @Transactional
+    public void updateOrderDetails(Integer orderID, String notes, String deliveryAddress) {
+        Order order = orderRepository.findById(orderID)
+                .orElseThrow(() -> new EntityNotFoundException("Order not found with id: " + orderID));
+        order.setNotes(notes);
+        order.setDeliveryAddress(deliveryAddress);
+        orderRepository.save(order);
+    }
+
+    /**
+     * Updates only the notes of an order.
+     *
+     * @param orderID the ID of the order to update
+     * @param notes the new notes for the order
+     * @throws EntityNotFoundException if the order is not found
+     */
+    @Transactional
+    public void updateOrderNotes(Integer orderID, String notes) {
+        Order order = orderRepository.findById(orderID)
+                .orElseThrow(() -> new EntityNotFoundException("Order not found with id: " + orderID));
+        order.setNotes(notes);
+        orderRepository.save(order);
+    }
+
+    /**
+     * Updates only the delivery address of an order.
+     *
+     * @param orderID the ID of the order to update
+     * @param deliveryAddress the new delivery address for the order
+     * @throws EntityNotFoundException if the order is not found
+     */
+    @Transactional
+    public void updateDeliveryAddress(Integer orderID, String deliveryAddress) {
+        Order order = orderRepository.findById(orderID)
+                .orElseThrow(() -> new EntityNotFoundException("Order not found with id: " + orderID));
+        order.setDeliveryAddress(deliveryAddress);
         orderRepository.save(order);
     }
 

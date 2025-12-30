@@ -41,6 +41,12 @@ public class Order {
     @Column(nullable = false)
     private OrderStatus status;
 
+    @Column
+    private String notes;
+
+    @Column
+    private String deliveryAddress;
+
 
 
 
