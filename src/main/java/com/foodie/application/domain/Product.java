@@ -40,5 +40,14 @@ public class Product {
             inverseJoinColumns = @JoinColumn(name = "allergen_id")
     )
     private Set<Allergen> allergens;
+
+    @ManyToMany
+    @JoinTable(
+            name = "product_ingredient",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "ingredient_id")
+    )
+    private Set<Ingredient> ingredients;
+
 }
 

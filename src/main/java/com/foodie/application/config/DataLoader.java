@@ -1,16 +1,20 @@
 package com.foodie.application.config;
 
+import com.foodie.application.domain.Establishment;
 import com.foodie.application.domain.Menu;
 import com.foodie.application.domain.MenuItem;
 import com.foodie.application.domain.Product;
+import com.foodie.application.repository.EstablishmentRepository;
 import com.foodie.application.repository.MenuItemRepository;
 import com.foodie.application.repository.MenuRepository;
 import com.foodie.application.repository.ProductRepository;
 import com.foodie.application.service.AllergenService;
+import com.foodie.application.service.IngredientService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -20,7 +24,9 @@ public class DataLoader {
 
     @Bean
     CommandLineRunner loadData(ProductRepository productRepository, MenuRepository menuRepository,
-                               MenuItemRepository menuItemRepository, AllergenService allergenService) {
+                               MenuItemRepository menuItemRepository, EstablishmentRepository establishmentRepository,
+                               AllergenService allergenService,
+                               IngredientService ingredientService) {
         return args -> {
             if (productRepository.count() == 0) { // evita duplicados al reiniciar
                 productRepository.save(Product.builder()
@@ -28,6 +34,7 @@ public class DataLoader {
                         .price(7.99)
                         .description("Jugosa carne con queso cheddar y pan brioche")
                         .allergens(allergenService.findOrCreateByNames(Set.of("Gluten", "Lácteos")))
+                        .ingredients(ingredientService.findOrCreateByNames(Set.of("Carne","Queso","Pan")))
                         .imageUrl("https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Hamburger_%2812164386105%29.jpg/1200px-Hamburger_%2812164386105%29.jpg")
                         .build());
 
@@ -36,6 +43,7 @@ public class DataLoader {
                         .price(8.50)
                         .description("Base de tomate, mozzarella fresca y albahaca")
                         .allergens(allergenService.findOrCreateByNames(Set.of("Gluten")))
+                        .ingredients(ingredientService.findOrCreateByNames(Set.of("Harina","Tomate","Mozzarella","Albahaca")))
                         .imageUrl("https://shorturl.at/XfeVn")
                         .build());
 
@@ -44,6 +52,7 @@ public class DataLoader {
                         .price(6.75)
                         .description("Pollo crujiente, ensalada y mayonesa")
                         .allergens(allergenService.findOrCreateByNames(Set.of("Huevo", "Gluten")))
+                        .ingredients(ingredientService.findOrCreateByNames(Set.of("Pollo","Lechuga","Mayonesa","Tortilla")))
                         .imageUrl("https://shorturl.at/nQtP9")
                         .build());
                 productRepository.save(Product.builder()
@@ -51,6 +60,7 @@ public class DataLoader {
                         .price(6.75)
                         .description("Pollo crujiente, ensalada y mayonesa")
                         .allergens(allergenService.findOrCreateByNames(Set.of("Huevo", "Gluten")))
+                        .ingredients(ingredientService.findOrCreateByNames(Set.of("Pollo","Lechuga","Mayonesa","Tortilla")))
                         .imageUrl("https://shorturl.at/nQtP9")
                         .build());
 
@@ -59,6 +69,7 @@ public class DataLoader {
                         .price(8.50)
                         .description("Carne de res, lechuga, tomate y queso cheddar")
                         .allergens(allergenService.findOrCreateByNames(Set.of("Gluten", "Lácteos")))
+                        .ingredients(ingredientService.findOrCreateByNames(Set.of("Carne","Lechuga","Tomate","Queso")))
                         .imageUrl("https://shorturl.at/bxH34")
                         .build());
 
@@ -67,6 +78,7 @@ public class DataLoader {
                         .price(7.50)
                         .description("Hamburguesa de garbanzos, lechuga y tomate")
                         .allergens(allergenService.findOrCreateByNames(Set.of("Gluten")))
+                        .ingredients(ingredientService.findOrCreateByNames(Set.of("Garbanzos","Lechuga","Tomate","Pan")))
                         .imageUrl("https://shorturl.at/fxZ03")
                         .build());
 
@@ -75,6 +87,7 @@ public class DataLoader {
                         .price(9.00)
                         .description("Tomate, mozzarella y albahaca fresca")
                         .allergens(allergenService.findOrCreateByNames(Set.of("Gluten", "Lácteos")))
+                        .ingredients(ingredientService.findOrCreateByNames(Set.of("Harina","Tomate","Mozzarella","Albahaca")))
                         .imageUrl("https://shorturl.at/kzGT6")
                         .build());
 
@@ -83,6 +96,7 @@ public class DataLoader {
                         .price(10.50)
                         .description("Pepperoni, queso mozzarella y salsa de tomate")
                         .allergens(allergenService.findOrCreateByNames(Set.of("Gluten", "Lácteos")))
+                        .ingredients(ingredientService.findOrCreateByNames(Set.of("Harina","Pepperoni","Mozzarella","Tomate")))
                         .imageUrl("https://shorturl.at/btyU5")
                         .build());
 
@@ -91,6 +105,7 @@ public class DataLoader {
                         .price(6.00)
                         .description("Lechuga, pollo, queso parmesano y aderezo César")
                         .allergens(allergenService.findOrCreateByNames(Set.of("Lácteos", "Huevo", "Pescado")))
+                        .ingredients(ingredientService.findOrCreateByNames(Set.of("Lechuga","Pollo","Parmesano","Aderezo")))
                         .imageUrl("https://shorturl.at/fvFZ6")
                         .build());
 
@@ -99,6 +114,7 @@ public class DataLoader {
                         .price(12.00)
                         .description("Selección de sushi y nigiri con salsa de soja")
                         .allergens(allergenService.findOrCreateByNames(Set.of("Pescado", "Gluten")))
+                        .ingredients(ingredientService.findOrCreateByNames(Set.of("Arroz","Pescado","Salsa de soja")))
                         .imageUrl("https://shorturl.at/hkMR2")
                         .build());
 
@@ -107,6 +123,7 @@ public class DataLoader {
                         .price(7.25)
                         .description("Tortillas de maíz, carne asada, cebolla y cilantro")
                         .allergens(Set.of())
+                        .ingredients(ingredientService.findOrCreateByNames(Set.of("Tortilla","Carne","Cebolla","Cilantro")))
                         .imageUrl("https://shorturl.at/iqN46")
                         .build());
 
@@ -115,6 +132,7 @@ public class DataLoader {
                         .price(6.50)
                         .description("Tortillas de maíz, pollo sazonado y pico de gallo")
                         .allergens(Set.of())
+                        .ingredients(ingredientService.findOrCreateByNames(Set.of("Tortilla","Pollo","Pico de Gallo")))
                         .imageUrl("https://shorturl.at/muvY1")
                         .build());
 
@@ -123,6 +141,7 @@ public class DataLoader {
                         .price(8.75)
                         .description("Pasta con salsa cremosa de queso parmesano")
                         .allergens(allergenService.findOrCreateByNames(Set.of("Gluten", "Lácteos")))
+                        .ingredients(ingredientService.findOrCreateByNames(Set.of("Pasta","Parmesano","Crema")))
                         .imageUrl("https://shorturl.at/ijRZ0")
                         .build());
 
@@ -131,6 +150,7 @@ public class DataLoader {
                         .price(9.50)
                         .description("Pasta con salsa de carne y tomate")
                         .allergens(allergenService.findOrCreateByNames(Set.of("Gluten")))
+                        .ingredients(ingredientService.findOrCreateByNames(Set.of("Pasta","Carne","Tomate")))
                         .imageUrl("https://shorturl.at/dkMZ3")
                         .build());
 
@@ -139,6 +159,7 @@ public class DataLoader {
                         .price(4.50)
                         .description("Fresas frescas, yogur y miel")
                         .allergens(allergenService.findOrCreateByNames(Set.of("Lácteos")))
+                        .ingredients(ingredientService.findOrCreateByNames(Set.of("Fresas","Yogur","Miel")))
                         .imageUrl("https://shorturl.at/ajLQ1")
                         .build());
 
@@ -147,6 +168,7 @@ public class DataLoader {
                         .price(4.75)
                         .description("Espinaca, kiwi, manzana y agua de coco")
                         .allergens(Set.of())
+                        .ingredients(ingredientService.findOrCreateByNames(Set.of("Espinaca","Kiwi","Manzana","Agua de coco")))
                         .imageUrl("https://shorturl.at/bmGJ3")
                         .build());
 
@@ -155,6 +177,7 @@ public class DataLoader {
                         .price(3.50)
                         .description("Helado cremoso de vainilla natural")
                         .allergens(allergenService.findOrCreateByNames(Set.of("Lácteos")))
+                        .ingredients(ingredientService.findOrCreateByNames(Set.of("Leche","Azúcar","Vainilla")))
                         .imageUrl("https://shorturl.at/fjLR9")
                         .build());
 
@@ -162,14 +185,14 @@ public class DataLoader {
                         .name("Brownie de Chocolate")
                         .price(4.25)
                         .description("Brownie de chocolate con nueces")
-                        .allergens(allergenService.findOrCreateByNames(Set.of("Gluten", "Lácteos", "Huevo", "Frutos " +
-                                "secos")))
+                        .allergens(allergenService.findOrCreateByNames(Set.of("Gluten", "Lácteos", "Huevo", "Frutos secos")))
+                        .ingredients(ingredientService.findOrCreateByNames(Set.of("Chocolate","Harina","Huevos","Nueces")))
                         .imageUrl("https://shorturl.at/hjKY8")
                         .build());
 
 
                 System.out.println("✅ Productos de prueba añadidos correctamente.");
-        };
+            };
             if (menuRepository.count() == 0) {
                 Menu menu = new Menu();
                 menu.setName("Menu Estudiante");
@@ -204,6 +227,19 @@ public class DataLoader {
                                 ));
 
                 menuRepository.save(menu2);
+            }
+
+            if (establishmentRepository.count() == 0) {
+                var establishment = Establishment.builder()
+                        .name("Bar Casa Manteca")
+                        .description("El Bar Casa Manteca es un lugar emblemático donde se fusiona la tradición " +
+                                "culinaria con un ambiente acogedor.")
+                        .address("Calle de los Gaitanes, 15, 29017 Málaga, España")
+                        .phone("+34 952 22 34 56")
+                        .openingTime(LocalTime.of(9, 0))
+                        .closingTime(LocalTime.of(22, 0)).build();
+
+                establishmentRepository.save(establishment);
             }
         };
 

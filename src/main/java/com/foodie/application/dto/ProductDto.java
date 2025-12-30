@@ -1,6 +1,7 @@
 package com.foodie.application.dto;
 
 import com.foodie.application.domain.Allergen;
+import com.foodie.application.domain.Ingredient;
 import com.foodie.application.domain.Product;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,6 +27,8 @@ public class ProductDto implements Serializable {
     private Double price;
     private String imageUrl;
     private Set<String> allergenNames;
+    Set<String> ingredients;
+
 
     /**
      * Converts a Product entity to ProductDisplayDto
@@ -47,4 +50,3 @@ public class ProductDto implements Serializable {
                 .build();
     }
 }
-
