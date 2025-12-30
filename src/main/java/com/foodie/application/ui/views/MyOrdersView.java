@@ -273,6 +273,21 @@ public class MyOrdersView extends VerticalLayout {
             paymentLayout.add(methodDiv, amountDiv, paymentStatusDiv);
         }
 
+        // Delivery info section
+        H3 deliveryTitle = new H3("Información de Entrega");
+        deliveryTitle.addClassNames(LumoUtility.Margin.Top.MEDIUM);
+
+        Div deliveryLayout = new Div();
+        deliveryLayout.getStyle().set("display", "grid");
+        deliveryLayout.getStyle().set("grid-template-columns", "1fr");
+        deliveryLayout.getStyle().set("gap", "1rem");
+
+        String deliveryAddress = order.getDeliveryAddress() != null && !order.getDeliveryAddress().isEmpty()
+                ? order.getDeliveryAddress()
+                : "No especificada";
+        Div addressDiv = createInfoDiv("Dirección", deliveryAddress);
+        deliveryLayout.add(addressDiv);
+
         // Items section
         H3 itemsTitle = new H3("Artículos");
         itemsTitle.addClassNames(LumoUtility.Margin.Top.MEDIUM);
@@ -288,6 +303,46 @@ public class MyOrdersView extends VerticalLayout {
             }
         } else {
             itemsList.add(new Paragraph("No hay artículos en este pedido"));
+        }
+
+        // Notes section
+        if (order.getNotes() != null && !order.getNotes().isEmpty()) {
+            H3 notesTitle = new H3("Notas");
+            notesTitle.addClassNames(LumoUtility.Margin.Top.MEDIUM);
+
+            Div notesDiv = new Div();
+            notesDiv.getStyle().set("border", "1px solid #d0d0d0");
+            notesDiv.getStyle().set("border-radius", "4px");
+            notesDiv.getStyle().set("padding", "12px");
+            notesDiv.getStyle().set("background-color", "#f9f9f9");
+
+            Paragraph notesText = new Paragraph(order.getNotes());
+            notesText.addClassNames(LumoUtility.Margin.NONE);
+            notesDiv.add(notesText);
+
+            content.add(
+                    infoTitle,
+                    infoLayout,
+                    paymentTitle,
+                    paymentLayout,
+                    deliveryTitle,
+                    deliveryLayout,
+                    notesTitle,
+                    notesDiv,
+                    itemsTitle,
+                    itemsList
+            );
+        } else {
+            content.add(
+                    infoTitle,
+                    infoLayout,
+                    paymentTitle,
+                    paymentLayout,
+                    deliveryTitle,
+                    deliveryLayout,
+                    itemsTitle,
+                    itemsList
+            );
         }
 
         // Action buttons
@@ -306,6 +361,14 @@ public class MyOrdersView extends VerticalLayout {
             actionLayout.add(cancelButton);
         }
 
+        // Add modify button for pending orders
+        if (order.getStatus() == OrderStatus.PENDING) {
+            Button modifyButton = new Button("Modificar Pedido", new Icon(VaadinIcon.EDIT));
+            modifyButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            modifyButton.addClickListener(e -> openModifyOrderDialog(order, detailsDialog));
+            actionLayout.add(modifyButton);
+        }
+
         // Add ticket/invoice button for completed orders
         if (order.getStatus() == OrderStatus.COMPLETED) {
             Button invoiceButton = new Button("Ticket/Factura", new Icon(VaadinIcon.FILE_TEXT));
@@ -315,16 +378,7 @@ public class MyOrdersView extends VerticalLayout {
         }
 
         actionLayout.add(closeButton);
-
-        content.add(
-                infoTitle,
-                infoLayout,
-                paymentTitle,
-                paymentLayout,
-                itemsTitle,
-                itemsList,
-                actionLayout
-        );
+        content.add(actionLayout);
 
         detailsDialog.add(content);
         detailsDialog.open();
@@ -486,6 +540,74 @@ public class MyOrdersView extends VerticalLayout {
                 this::loadOrders
         );
         paymentGateway.open();
+    }
+
+    /**
+     * Opens dialog to modify order details (address and notes)
+     */
+    private void openModifyOrderDialog(OrderDto order, Dialog parentDialog) {
+        Dialog modifyDialog = new Dialog();
+        modifyDialog.setHeaderTitle("Modificar Pedido #" + order.getId());
+        modifyDialog.setWidth("500px");
+
+        VerticalLayout content = new VerticalLayout();
+        content.setSpacing(true);
+        content.setPadding(true);
+
+        // Address field
+        com.vaadin.flow.component.textfield.TextArea addressField =
+                new com.vaadin.flow.component.textfield.TextArea("Dirección de Entrega");
+        addressField.setWidthFull();
+        addressField.setHeight("80px");
+        addressField.setValue(order.getDeliveryAddress() != null ? order.getDeliveryAddress() : "");
+        addressField.setPlaceholder("Ingresa tu dirección de entrega");
+
+        // Notes field
+        com.vaadin.flow.component.textfield.TextArea notesField =
+                new com.vaadin.flow.component.textfield.TextArea("Notas Adicionales");
+        notesField.setWidthFull();
+        notesField.setHeight("80px");
+        notesField.setValue(order.getNotes() != null ? order.getNotes() : "");
+        notesField.setPlaceholder("Agrega notas especiales para tu pedido (ej: sin cebolla, extra salsa)");
+
+        content.add(addressField, notesField);
+
+        // Action buttons
+        HorizontalLayout buttonLayout = new HorizontalLayout();
+        buttonLayout.setWidthFull();
+        buttonLayout.setSpacing(true);
+        buttonLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
+
+        Button saveButton = new Button("Guardar Cambios", new Icon(VaadinIcon.CHECK));
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveButton.addClickListener(e -> {
+            try {
+                // Update order with new values
+                order.setDeliveryAddress(addressField.getValue());
+                order.setNotes(notesField.getValue());
+
+                // Call the service to update the order
+                orderService.updateOrderDetails(order.getId(), notesField.getValue(), addressField.getValue());
+
+                Notification.show("Pedido modificado exitosamente")
+                        .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+
+                modifyDialog.close();
+                parentDialog.close();
+                loadOrders();
+            } catch (Exception ex) {
+                Notification.show("Error al modificar el pedido: " + ex.getMessage())
+                        .addThemeVariants(NotificationVariant.LUMO_ERROR);
+            }
+        });
+
+        Button cancelButton = new Button("Cancelar", e -> modifyDialog.close());
+
+        buttonLayout.add(saveButton, cancelButton);
+        content.add(buttonLayout);
+
+        modifyDialog.add(content);
+        modifyDialog.open();
     }
 }
 
