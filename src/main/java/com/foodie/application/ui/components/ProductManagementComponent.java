@@ -72,12 +72,16 @@ public class ProductManagementComponent extends VerticalLayout {
         addProductBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         addProductBtn.addClickListener(e -> openAddProductDialog());
 
+        Button manageIngredientsBtn = new Button("Gestionar Ingredientes", new Icon(VaadinIcon.CUTLERY));
+        manageIngredientsBtn.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
+        manageIngredientsBtn.addClickListener(e -> openManageIngredientsDialog());
+
         HorizontalLayout searchLayout = new HorizontalLayout();
         searchLayout.setWidthFull();
         searchLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         searchLayout.setAlignItems(FlexComponent.Alignment.CENTER);
         searchLayout.setSpacing(true);
-        searchLayout.add(searchField, addProductBtn);
+        searchLayout.add(searchField, addProductBtn, manageIngredientsBtn);
         add(searchLayout);
 
         // Products Grid
@@ -215,7 +219,55 @@ public class ProductManagementComponent extends VerticalLayout {
         ingredientList.setPadding(false);
         ingredientList.setSpacing(false);
 
-        // Campo para agregar ingredientes
+        // Picker con ingredientes existentes
+        java.util.List<com.foodie.application.domain.Ingredient> allIngredientsData = ingredientService.getAllIngredients();
+        java.util.List<String> existingIngredients = new java.util.ArrayList<>(allIngredientsData.stream()
+                .map(com.foodie.application.domain.Ingredient::getName)
+                .toList());
+
+        // ComboBox para seleccionar ingredientes
+        com.vaadin.flow.component.combobox.ComboBox<String> ingredientSelect =
+                new com.vaadin.flow.component.combobox.ComboBox<>();
+        ingredientSelect.setLabel("Seleccionar ingrediente");
+        ingredientSelect.setItems(existingIngredients);
+        ingredientSelect.setWidthFull();
+        ingredientSelect.setAllowCustomValue(false);
+        ingredientSelect.setPlaceholder("-- Selecciona un ingrediente --");
+
+
+        ingredientSelect.addValueChangeListener(event -> {
+            String selectedIngredient = event.getValue();
+            if (selectedIngredient != null && !selectedIngredient.isEmpty() && !selectedIngredients.contains(selectedIngredient)) {
+                selectedIngredients.add(selectedIngredient);
+
+                HorizontalLayout ingredientItem = new HorizontalLayout();
+                ingredientItem.setAlignItems(FlexComponent.Alignment.CENTER);
+                ingredientItem.setSpacing(true);
+
+                com.vaadin.flow.component.html.Span ingredientLabel =
+                        new com.vaadin.flow.component.html.Span(selectedIngredient);
+
+                Button removeFromProductBtn = new Button("", new Icon(VaadinIcon.CLOSE));
+                removeFromProductBtn.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_ERROR);
+                removeFromProductBtn.getElement().setProperty("title", "Eliminar del producto");
+                removeFromProductBtn.addClickListener(event2 -> {
+                    selectedIngredients.remove(selectedIngredient);
+                    ingredientList.remove(ingredientItem);
+                });
+
+                ingredientItem.add(ingredientLabel, removeFromProductBtn);
+                ingredientList.add(ingredientItem);
+
+                // Limpiar el select
+                ingredientSelect.clear();
+
+                Notification.show("Ingrediente agregado", 2000, Notification.Position.TOP_CENTER)
+                        .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            }
+        });
+
+
+        // Campo para agregar ingredientes nuevos
         HorizontalLayout newIngredientLayout = new HorizontalLayout();
         TextField newIngredientField = new TextField();
         newIngredientField.setPlaceholder("Nombre del ingrediente");
@@ -227,7 +279,6 @@ public class ProductManagementComponent extends VerticalLayout {
                     String ingredientName = newIngredientField.getValue();
                     selectedIngredients.add(ingredientName);
 
-                    // Crear un label para mostrar el ingrediente con opción de borrar
                     HorizontalLayout ingredientItem = new HorizontalLayout();
                     ingredientItem.setAlignItems(FlexComponent.Alignment.CENTER);
                     ingredientItem.setSpacing(true);
@@ -259,7 +310,7 @@ public class ProductManagementComponent extends VerticalLayout {
         newIngredientLayout.add(newIngredientField, addIngredientBtn);
         newIngredientLayout.setWidthFull();
 
-        content.add(nameField, descriptionField, priceField, imageUrlField, allergenTitle, allergenList, newAllergenLayout, ingredientTitle, ingredientList, newIngredientLayout);
+        content.add(nameField, descriptionField, priceField, imageUrlField, allergenTitle, allergenList, newAllergenLayout, ingredientTitle, ingredientSelect, ingredientList, newIngredientLayout);
 
         HorizontalLayout buttonLayout = new HorizontalLayout();
         Button saveBtn = new Button("Guardar", e -> {
@@ -411,7 +462,54 @@ public class ProductManagementComponent extends VerticalLayout {
             ingredientList.add(ingredientItem);
         }
 
-        // Campo para agregar ingredientes
+        // Picker con ingredientes existentes
+        java.util.List<com.foodie.application.domain.Ingredient> allIngredientsData = ingredientService.getAllIngredients();
+        java.util.List<String> existingIngredients = new java.util.ArrayList<>(allIngredientsData.stream()
+                .map(com.foodie.application.domain.Ingredient::getName)
+                .toList());
+
+        // ComboBox para seleccionar ingredientes
+        com.vaadin.flow.component.combobox.ComboBox<String> ingredientSelect =
+                new com.vaadin.flow.component.combobox.ComboBox<>();
+        ingredientSelect.setLabel("Seleccionar ingrediente");
+        ingredientSelect.setItems(existingIngredients);
+        ingredientSelect.setWidthFull();
+        ingredientSelect.setAllowCustomValue(false);
+        ingredientSelect.setPlaceholder("-- Selecciona un ingrediente --");
+
+
+        ingredientSelect.addValueChangeListener(event -> {
+            String selectedIngredient = event.getValue();
+            if (selectedIngredient != null && !selectedIngredient.isEmpty() && !selectedIngredients.contains(selectedIngredient)) {
+                selectedIngredients.add(selectedIngredient);
+
+                HorizontalLayout ingredientItem = new HorizontalLayout();
+                ingredientItem.setAlignItems(FlexComponent.Alignment.CENTER);
+                ingredientItem.setSpacing(true);
+
+                com.vaadin.flow.component.html.Span ingredientLabel =
+                        new com.vaadin.flow.component.html.Span(selectedIngredient);
+
+                Button removeIngredientBtn = new Button("", new Icon(VaadinIcon.CLOSE));
+                removeIngredientBtn.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_ERROR);
+                removeIngredientBtn.addClickListener(event2 -> {
+                    selectedIngredients.remove(selectedIngredient);
+                    ingredientList.remove(ingredientItem);
+                });
+
+                ingredientItem.add(ingredientLabel, removeIngredientBtn);
+                ingredientList.add(ingredientItem);
+
+                // Limpiar el select
+                ingredientSelect.clear();
+
+                Notification.show("Ingrediente agregado", 2000, Notification.Position.TOP_CENTER)
+                        .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            }
+        });
+
+
+        // Campo para agregar ingredientes nuevos
         HorizontalLayout newIngredientLayout = new HorizontalLayout();
         TextField newIngredientField = new TextField();
         newIngredientField.setPlaceholder("Nombre del ingrediente");
@@ -454,7 +552,7 @@ public class ProductManagementComponent extends VerticalLayout {
         newIngredientLayout.add(newIngredientField, addIngredientBtn);
         newIngredientLayout.setWidthFull();
 
-        content.add(nameField, descriptionField, priceField, imageUrlField, allergenTitle, allergenList, newAllergenLayout, ingredientTitle, ingredientList, newIngredientLayout);
+        content.add(nameField, descriptionField, priceField, imageUrlField, allergenTitle, allergenList, newAllergenLayout, ingredientTitle, ingredientSelect, ingredientList, newIngredientLayout);
 
         HorizontalLayout buttonLayout = new HorizontalLayout();
         Button saveBtn = new Button("Guardar", e -> {
@@ -509,8 +607,7 @@ public class ProductManagementComponent extends VerticalLayout {
     }
 
     private void loadProducts() {
-        var products = productService.getAllProductsAsDto();
-        allProducts = products;
+        allProducts = productService.getAllProductsAsDto();
 
         if (productsGrid != null) {
             productsGrid.setItems(allProducts);
@@ -527,5 +624,78 @@ public class ProductManagementComponent extends VerticalLayout {
             productsGrid.setItems(filteredProducts);
         }
     }
-}
 
+    private void openManageIngredientsDialog() {
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Gestionar Ingredientes");
+        dialog.setWidth("600px");
+        dialog.setHeight("auto");
+
+        VerticalLayout content = new VerticalLayout();
+        content.setSpacing(true);
+        content.setPadding(true);
+
+        // Obtener todos los ingredientes
+        java.util.List<com.foodie.application.domain.Ingredient> allIngredients = ingredientService.getAllIngredients();
+
+        if (allIngredients.isEmpty()) {
+            content.add(new com.vaadin.flow.component.html.Span("No hay ingredientes registrados"));
+        } else {
+            // Grid para mostrar ingredientes
+            Grid<com.foodie.application.domain.Ingredient> ingredientsGrid = new Grid<>(com.foodie.application.domain.Ingredient.class, false);
+            ingredientsGrid.setWidthFull();
+            ingredientsGrid.setHeight("400px");
+            ingredientsGrid.addThemeVariants(GridVariant.LUMO_COMPACT);
+
+            ingredientsGrid.addColumn(com.foodie.application.domain.Ingredient::getId)
+                    .setHeader("ID")
+                    .setWidth("80px");
+            ingredientsGrid.addColumn(com.foodie.application.domain.Ingredient::getName)
+                    .setHeader("Nombre");
+
+            // Columna de acciones
+            ingredientsGrid.addComponentColumn(ingredient -> {
+                Button deleteBtn = new Button(new Icon(VaadinIcon.TRASH));
+                deleteBtn.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_ERROR);
+                deleteBtn.getElement().setProperty("title", "Eliminar ingrediente");
+                deleteBtn.addClickListener(e -> {
+                    ConfirmDialog confirmDialog = new ConfirmDialog();
+                    confirmDialog.setHeader("Confirmar eliminación");
+                    confirmDialog.setText("¿Estás seguro de que deseas eliminar el ingrediente '" + ingredient.getName() + "'?");
+                    confirmDialog.setConfirmText("Eliminar");
+                    confirmDialog.setCancelText("Cancelar");
+                    confirmDialog.setConfirmButtonTheme("error primary");
+
+                    confirmDialog.addConfirmListener(event -> {
+                        try {
+                            ingredientService.deleteIngredient(ingredient.getId());
+                            Notification.show("Ingrediente eliminado exitosamente", 2000, Notification.Position.TOP_CENTER)
+                                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                            dialog.close();
+                            openManageIngredientsDialog();
+                        } catch (Exception ex) {
+                            Notification.show("Error al eliminar ingrediente: " + ex.getMessage(), 3000, Notification.Position.TOP_CENTER)
+                                    .addThemeVariants(NotificationVariant.LUMO_ERROR);
+                        }
+                    });
+
+                    confirmDialog.open();
+                });
+
+                return deleteBtn;
+            }).setHeader("Acciones").setWidth("100px");
+
+            ingredientsGrid.setItems(allIngredients);
+            content.add(ingredientsGrid);
+        }
+
+        // Botón para cerrar
+        HorizontalLayout buttonLayout = new HorizontalLayout();
+        Button closeBtn = new Button("Cerrar", e -> dialog.close());
+        buttonLayout.add(closeBtn);
+
+        dialog.add(content);
+        dialog.getFooter().add(buttonLayout);
+        dialog.open();
+    }
+}

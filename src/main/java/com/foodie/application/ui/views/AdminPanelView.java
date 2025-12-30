@@ -83,14 +83,7 @@ public class AdminPanelView extends VerticalLayout {
      * Creates the header section with title
      */
     private HorizontalLayout createHeader() {
-        H1 title = new H1("Panel de Administración");
-        title.addClassNames(
-                LumoUtility.Margin.Top.NONE,
-                LumoUtility.TextColor.PRIMARY,
-                LumoUtility.FontSize.XLARGE
-        );
-
-        HorizontalLayout header = new HorizontalLayout(title);
+        HorizontalLayout header = new HorizontalLayout();
         header.setWidthFull();
         header.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         header.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);

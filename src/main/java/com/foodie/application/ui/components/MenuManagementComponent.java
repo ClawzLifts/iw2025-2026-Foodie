@@ -296,9 +296,7 @@ public class MenuManagementComponent extends VerticalLayout {
         productSelect.setLabel("Producto");
         productSelect.setWidthFull();
 
-        List<ProductDto> products = productService.getAllProducts(menu.getId()).stream()
-                .map(ProductDto::fromProduct)
-                .toList();
+        List<ProductDto> products = productService.getAllProductsAsDto();
         productSelect.setItems(products);
         productSelect.setItemLabelGenerator(ProductDto::getName);
 
