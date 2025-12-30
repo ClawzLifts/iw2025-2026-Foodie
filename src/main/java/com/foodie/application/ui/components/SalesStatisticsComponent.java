@@ -160,15 +160,15 @@ public class SalesStatisticsComponent extends VerticalLayout {
             statisticsGrid = new Grid<>(SalesStatisticsDto.class);
             statisticsGrid.setItems(statistics);
             statisticsGrid.setColumns();
-            statisticsGrid.addColumn(stat -> stat.getDate()).setHeader("Fecha").setSortable(true);
+            statisticsGrid.addColumn(stat -> stat.getDate()).setHeader("Fecha").setSortable(true).setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
             statisticsGrid.addColumn(SalesStatisticsDto::getQuantitySold)
-                    .setHeader("Cantidad Vendida").setSortable(true);
+                    .setHeader("Cantidad Vendida").setSortable(true).setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
             statisticsGrid.addColumn(stat -> String.format("$%.2f", stat.getTotalRevenue()))
-                    .setHeader("Ingresos Totales").setSortable(true);
+                    .setHeader("Ingresos Totales").setSortable(true).setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
             statisticsGrid.addColumn(SalesStatisticsDto::getNumberOfOrders)
-                    .setHeader("Número de Pedidos").setSortable(true);
+                    .setHeader("Número de Pedidos").setSortable(true).setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
             statisticsGrid.addColumn(stat -> String.format("$%.2f", stat.getAverageOrderValue()))
-                    .setHeader("Valor Promedio de Pedido").setSortable(true);
+                    .setHeader("Valor Promedio de Pedido").setSortable(true).setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
 
             statisticsGrid.setWidthFull();
             statisticsGrid.setHeight("400px");
@@ -195,15 +195,15 @@ public class SalesStatisticsComponent extends VerticalLayout {
             statisticsGrid.setItems(statistics);
             statisticsGrid.setColumns();
             statisticsGrid.addColumn(SalesStatisticsDto::getProductName)
-                    .setHeader("Nombre del Producto").setSortable(true);
+                    .setHeader("Nombre del Producto").setSortable(true).setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
             statisticsGrid.addColumn(SalesStatisticsDto::getQuantitySold)
-                    .setHeader("Cantidad Vendida").setSortable(true);
+                    .setHeader("Cantidad Vendida").setSortable(true).setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
             statisticsGrid.addColumn(stat -> String.format("$%.2f", stat.getTotalRevenue()))
-                    .setHeader("Ingresos Totales").setSortable(true);
+                    .setHeader("Ingresos Totales").setSortable(true).setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
             statisticsGrid.addColumn(SalesStatisticsDto::getNumberOfOrders)
-                    .setHeader("Número de Pedidos").setSortable(true);
+                    .setHeader("Número de Pedidos").setSortable(true).setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
             statisticsGrid.addColumn(stat -> String.format("$%.2f", stat.getAverageOrderValue()))
-                    .setHeader("Valor Promedio por Pedido").setSortable(true);
+                    .setHeader("Valor Promedio por Pedido").setSortable(true).setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
 
             statisticsGrid.setWidthFull();
             statisticsGrid.setHeight("400px");

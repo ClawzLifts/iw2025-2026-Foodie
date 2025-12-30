@@ -74,16 +74,18 @@ public class UserManagementComponent extends VerticalLayout {
 
         searchField.addValueChangeListener(e -> filterUsers(e.getValue()));
 
-        usersGrid.addColumn(UserDto::getId).setHeader("ID").setWidth("80px");
-        usersGrid.addColumn(UserDto::getUsername).setHeader("Usuario");
-        usersGrid.addColumn(UserDto::getEmail).setHeader("Email");
-        usersGrid.addColumn(UserDto::getFullName).setHeader("Nombre Completo");
-        usersGrid.addColumn(UserDto::getRoleName).setHeader("Rol");
-        usersGrid.addColumn(UserDto::getPhoneNumber).setHeader("Teléfono");
+        usersGrid.addColumn(UserDto::getId).setHeader("ID").setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
+        usersGrid.addColumn(UserDto::getUsername).setHeader("Usuario").setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
+        usersGrid.addColumn(UserDto::getEmail).setHeader("Email").setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
+        usersGrid.addColumn(UserDto::getFullName).setHeader("Nombre Completo").setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
+        usersGrid.addColumn(UserDto::getRoleName).setHeader("Rol").setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
+        usersGrid.addColumn(UserDto::getPhoneNumber).setHeader("Teléfono").setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
 
         usersGrid.addComponentColumn(userDto -> {
             HorizontalLayout actions = new HorizontalLayout();
             actions.setSpacing(true);
+            actions.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+            actions.setWidthFull();
 
             Button viewBtn = new Button(new Icon(VaadinIcon.EYE));
             viewBtn.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_CONTRAST);
@@ -99,7 +101,7 @@ public class UserManagementComponent extends VerticalLayout {
 
             actions.add(viewBtn, editBtn, deleteBtn);
             return actions;
-        }).setHeader("Acciones").setWidth("200px");
+        }).setHeader("Acciones").setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
 
         add(usersGrid);
 

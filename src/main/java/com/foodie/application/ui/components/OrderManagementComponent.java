@@ -108,16 +108,18 @@ public class OrderManagementComponent extends VerticalLayout {
         ordersGrid.addThemeVariants(GridVariant.LUMO_COMPACT);
         ordersGrid.setSelectionMode(Grid.SelectionMode.NONE);
 
-        ordersGrid.addColumn(OrderDto::getId).setHeader("ID").setWidth("80px");
-        ordersGrid.addColumn(OrderDto::getUsername).setHeader("Usuario");
-        ordersGrid.addColumn(OrderDto::getDate).setHeader("Fecha");
+        ordersGrid.addColumn(OrderDto::getId).setHeader("ID").setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
+        ordersGrid.addColumn(OrderDto::getUsername).setHeader("Usuario").setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
+        ordersGrid.addColumn(OrderDto::getDate).setHeader("Fecha").setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
 
         // Columna de Estado con Chip de color
-        ordersGrid.addComponentColumn(orderDto -> createStatusChip(orderDto.getStatus())).setHeader("Estado").setWidth("120px");
+        ordersGrid.addComponentColumn(orderDto -> createStatusChip(orderDto.getStatus())).setHeader("Estado").setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
 
         ordersGrid.addComponentColumn(orderDto -> {
             HorizontalLayout statusLayout = new HorizontalLayout();
             statusLayout.setSpacing(true);
+            statusLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+            statusLayout.setWidthFull();
 
             Select<OrderStatus> statusSelect = new Select<>();
             statusSelect.setItems(OrderStatus.values());
@@ -147,7 +149,7 @@ public class OrderManagementComponent extends VerticalLayout {
 
             statusLayout.add(statusSelect, updateBtn, viewBtn);
             return statusLayout;
-        }).setHeader("Acciones").setWidth("500px");
+        }).setHeader("Acciones").setFlexGrow(3).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
 
         add(ordersGrid);
 

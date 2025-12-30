@@ -92,12 +92,16 @@ public class MenuManagementComponent extends VerticalLayout {
 
         searchField.addValueChangeListener(e -> filterMenus(e.getValue()));
 
-        menusGrid.addColumn(MenuDto::getId).setHeader("ID").setWidth("80px");
-        menusGrid.addColumn(MenuDto::getName).setHeader("Nombre");
+        // ...existing code...
+        menusGrid.addColumn(MenuDto::getId).setHeader("ID").setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
+        menusGrid.addColumn(MenuDto::getName).setHeader("Nombre").setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
 
         menusGrid.addComponentColumn(menu -> {
+            // ...existing code...
             HorizontalLayout actions = new HorizontalLayout();
             actions.setSpacing(true);
+            actions.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+            actions.setWidthFull();
 
             Button editBtn = new Button(new Icon(VaadinIcon.EDIT));
             editBtn.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_CONTRAST);
@@ -113,7 +117,7 @@ public class MenuManagementComponent extends VerticalLayout {
 
             actions.add(itemsBtn, editBtn, deleteBtn);
             return actions;
-        }).setHeader("Acciones").setWidth("300px");
+        }).setHeader("Acciones").setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
 
         add(menusGrid);
 
@@ -238,14 +242,16 @@ public class MenuManagementComponent extends VerticalLayout {
         itemsGrid.addThemeVariants(GridVariant.LUMO_COMPACT);
         itemsGrid.setSelectionMode(Grid.SelectionMode.NONE);
 
-        itemsGrid.addColumn(MenuItemDisplayDto::getProductName).setHeader("Producto");
-        itemsGrid.addColumn(MenuItemDisplayDto::getOriginalPrice).setHeader("Precio");
-        itemsGrid.addColumn(MenuItemDisplayDto::getFeatured).setHeader("Destacado");
-        itemsGrid.addColumn(MenuItemDisplayDto::getDiscountPercentage).setHeader("Descuento %");
+        itemsGrid.addColumn(MenuItemDisplayDto::getProductName).setHeader("Producto").setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
+        itemsGrid.addColumn(MenuItemDisplayDto::getOriginalPrice).setHeader("Precio").setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
+        itemsGrid.addColumn(MenuItemDisplayDto::getFeatured).setHeader("Destacado").setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
+        itemsGrid.addColumn(MenuItemDisplayDto::getDiscountPercentage).setHeader("Descuento %").setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
 
         itemsGrid.addComponentColumn(item -> {
             HorizontalLayout actions = new HorizontalLayout();
             actions.setSpacing(true);
+            actions.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+            actions.setWidthFull();
 
             Button editBtn = new Button(new Icon(VaadinIcon.EDIT));
             editBtn.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_CONTRAST);
@@ -262,7 +268,7 @@ public class MenuManagementComponent extends VerticalLayout {
 
             actions.add(editBtn, removeBtn);
             return actions;
-        }).setHeader("Acciones").setWidth("150px");
+        }).setHeader("Acciones").setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
 
         addItemBtn.addClickListener(e -> openAddMenuItemDialog(menu, itemsGrid));
 

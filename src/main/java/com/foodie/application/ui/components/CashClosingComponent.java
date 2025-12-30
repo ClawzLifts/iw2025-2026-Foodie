@@ -68,11 +68,7 @@ public class CashClosingComponent extends VerticalLayout {
         actionsLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         add(actionsLayout);
 
-        // Sales by payment method section
-        H3 salesTitle = new H3("Ventas del Día por Método de Pago");
-        salesTitle.addClassNames(LumoUtility.Margin.Top.LARGE);
-        add(salesTitle);
-
+        // Sales by payment method section (no title)
         salesLayout = new VerticalLayout();
         salesLayout.setPadding(true);
         salesLayout.setSpacing(true);
@@ -85,7 +81,11 @@ public class CashClosingComponent extends VerticalLayout {
         // Historical closings section
         H3 historyTitle = new H3("Histórico de Cierres de Caja");
         historyTitle.addClassNames(LumoUtility.Margin.Top.LARGE);
-        add(historyTitle);
+        HorizontalLayout historyTitleLayout = new HorizontalLayout();
+        historyTitleLayout.setWidthFull();
+        historyTitleLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        historyTitleLayout.add(historyTitle);
+        add(historyTitleLayout);
 
         VerticalLayout historyLayout = new VerticalLayout();
         historyLayout.setPadding(true);
@@ -246,6 +246,8 @@ public class CashClosingComponent extends VerticalLayout {
             HorizontalLayout statusLayout = new HorizontalLayout();
             statusLayout.setSpacing(true);
             statusLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+            statusLayout.setWidthFull();
+            statusLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
 
             String statusText = todaysCash.getIsClosed() ? "✓ CAJA CERRADA" : "● CAJA ABIERTA";
             Span statusSpan = new Span(statusText);

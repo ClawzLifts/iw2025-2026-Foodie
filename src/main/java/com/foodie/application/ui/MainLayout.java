@@ -19,9 +19,6 @@ import com.foodie.application.service.CartService;
 import com.foodie.application.service.UserService;
 import com.foodie.application.ui.components.ShoppingCartComponent;
 import com.foodie.application.ui.views.MainView;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 
 public class MainLayout extends AppLayout {
@@ -30,10 +27,15 @@ public class MainLayout extends AppLayout {
     private final UserService userService;
     private ShoppingCartComponent shoppingCart;
 
-    @Autowired
     public MainLayout(CartService cartService, UserService userService) {
         this.cartService = cartService;
         this.userService = userService;
+
+        // Add horizontal margins to the layout
+        getStyle()
+                .set("padding-left", "25rem")
+                .set("padding-right", "25rem");
+
         // Header
         createHeader();
     }

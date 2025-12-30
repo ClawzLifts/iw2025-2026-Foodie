@@ -93,10 +93,10 @@ public class ProductManagementComponent extends VerticalLayout {
 
         searchField.addValueChangeListener(e -> filterProducts(e.getValue()));
 
-        productsGrid.addColumn(ProductDto::getId).setHeader("ID").setWidth("80px");
-        productsGrid.addColumn(ProductDto::getName).setHeader("Nombre");
-        productsGrid.addColumn(ProductDto::getDescription).setHeader("Descripción");
-        productsGrid.addColumn(ProductDto::getPrice).setHeader("Precio");
+        productsGrid.addColumn(ProductDto::getId).setHeader("ID").setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
+        productsGrid.addColumn(ProductDto::getName).setHeader("Nombre").setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
+        productsGrid.addColumn(ProductDto::getDescription).setHeader("Descripción").setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
+        productsGrid.addColumn(ProductDto::getPrice).setHeader("Precio").setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
 
         // Columna de ingredientes
         productsGrid.addComponentColumn(productDto -> {
@@ -108,11 +108,13 @@ public class ProductManagementComponent extends VerticalLayout {
             com.vaadin.flow.component.html.Span emptySpan = new com.vaadin.flow.component.html.Span("Sin ingredientes");
             emptySpan.addClassNames(LumoUtility.TextColor.SECONDARY);
             return emptySpan;
-        }).setHeader("Ingredientes").setFlexGrow(1);
+        }).setHeader("Ingredientes").setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
 
         productsGrid.addComponentColumn(productDto -> {
             HorizontalLayout actions = new HorizontalLayout();
             actions.setSpacing(true);
+            actions.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+            actions.setWidthFull();
 
             Button editBtn = new Button(new Icon(VaadinIcon.EDIT));
             editBtn.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_CONTRAST);
@@ -124,7 +126,7 @@ public class ProductManagementComponent extends VerticalLayout {
 
             actions.add(editBtn, deleteBtn);
             return actions;
-        }).setHeader("Acciones").setWidth("150px");
+        }).setHeader("Acciones").setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
 
         add(productsGrid);
 
@@ -649,12 +651,20 @@ public class ProductManagementComponent extends VerticalLayout {
 
             ingredientsGrid.addColumn(com.foodie.application.domain.Ingredient::getId)
                     .setHeader("ID")
-                    .setWidth("80px");
+                    .setFlexGrow(1)
+                    .setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
             ingredientsGrid.addColumn(com.foodie.application.domain.Ingredient::getName)
-                    .setHeader("Nombre");
+                    .setHeader("Nombre")
+                    .setFlexGrow(1)
+                    .setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
 
             // Columna de acciones
             ingredientsGrid.addComponentColumn(ingredient -> {
+                HorizontalLayout actions = new HorizontalLayout();
+                actions.setSpacing(true);
+                actions.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+                actions.setWidthFull();
+
                 Button deleteBtn = new Button(new Icon(VaadinIcon.TRASH));
                 deleteBtn.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_ERROR);
                 deleteBtn.getElement().setProperty("title", "Eliminar ingrediente");
@@ -682,8 +692,9 @@ public class ProductManagementComponent extends VerticalLayout {
                     confirmDialog.open();
                 });
 
-                return deleteBtn;
-            }).setHeader("Acciones").setWidth("100px");
+                actions.add(deleteBtn);
+                return actions;
+            }).setHeader("Acciones").setFlexGrow(1).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
 
             ingredientsGrid.setItems(allIngredients);
             content.add(ingredientsGrid);
