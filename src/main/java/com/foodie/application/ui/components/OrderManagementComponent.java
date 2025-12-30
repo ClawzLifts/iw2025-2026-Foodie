@@ -250,53 +250,13 @@ public class OrderManagementComponent extends VerticalLayout {
 
         content.add(infoLayout);
 
-        // Delivery Address Section
-        H3 deliveryTitle = new H3("Dirección de Entrega:");
-        content.add(deliveryTitle);
-
-        VerticalLayout deliveryInfo = new VerticalLayout();
-        deliveryInfo.setPadding(false);
-        deliveryInfo.setSpacing(false);
-        deliveryInfo.addClassName(LumoUtility.Border.ALL);
-        deliveryInfo.addClassName(LumoUtility.Padding.MEDIUM);
-        deliveryInfo.addClassName(LumoUtility.BorderRadius.MEDIUM);
-
-        if (orderDto.getDeliveryAddress() != null && !orderDto.getDeliveryAddress().isEmpty()) {
-            deliveryInfo.add(new Span(orderDto.getDeliveryAddress()));
-        } else {
-            Span emptyAddress = new Span("No especificada");
-            emptyAddress.addClassNames(LumoUtility.TextColor.SECONDARY);
-            deliveryInfo.add(emptyAddress);
-        }
-        content.add(deliveryInfo);
-
-        // Notes Section
-        H3 notesTitle = new H3("Notas Especiales:");
-        content.add(notesTitle);
-
-        VerticalLayout notesInfo = new VerticalLayout();
-        notesInfo.setPadding(false);
-        notesInfo.setSpacing(false);
-        notesInfo.addClassName(LumoUtility.Border.ALL);
-        notesInfo.addClassName(LumoUtility.Padding.MEDIUM);
-        notesInfo.addClassName(LumoUtility.BorderRadius.MEDIUM);
-
-        if (orderDto.getNotes() != null && !orderDto.getNotes().isEmpty()) {
-            notesInfo.add(new Span(orderDto.getNotes()));
-        } else {
-            Span emptyNotes = new Span("Sin notas");
-            emptyNotes.addClassNames(LumoUtility.TextColor.SECONDARY);
-            notesInfo.add(emptyNotes);
-        }
-        content.add(notesInfo);
-
-        // Items Grid
+        // Items Grid (Primero)
         H3 itemsTitle = new H3("Productos:");
         content.add(itemsTitle);
 
         Grid<ProductListDto> itemsGrid = new Grid<>(ProductListDto.class, false);
         itemsGrid.setWidthFull();
-        itemsGrid.setHeightFull();
+        itemsGrid.setHeight("300px");
         itemsGrid.addThemeVariants(GridVariant.LUMO_COMPACT);
         itemsGrid.setSelectionMode(Grid.SelectionMode.NONE);
 
@@ -321,22 +281,106 @@ public class OrderManagementComponent extends VerticalLayout {
 
         itemsGrid.setItems(orderDto.getItems());
         content.add(itemsGrid);
-        content.setFlexGrow(1, itemsGrid);
 
-        // Payment info
+        // Payment, Delivery Address and Notes in horizontal layout
+        HorizontalLayout bottomLayout = new HorizontalLayout();
+        bottomLayout.setWidthFull();
+        bottomLayout.setSpacing(true);
+        bottomLayout.setPadding(false);
+        bottomLayout.setAlignItems(FlexComponent.Alignment.START);
+
+        // Payment info (left)
+        VerticalLayout paymentSection = new VerticalLayout();
+        paymentSection.setPadding(false);
+        paymentSection.setSpacing(false);
+        paymentSection.setWidth("33%");
+
         if (orderDto.getPayment() != null) {
             H3 paymentTitle = new H3("Pago:");
-            content.add(paymentTitle);
+            paymentTitle.addClassNames(LumoUtility.Margin.Top.NONE, LumoUtility.Margin.Bottom.SMALL);
+            paymentSection.add(paymentTitle);
 
             VerticalLayout paymentInfo = new VerticalLayout();
             paymentInfo.setPadding(false);
             paymentInfo.setSpacing(false);
-            paymentInfo.add(new Span("Método: " + orderDto.getPayment().getPaymentMethod()));
-            paymentInfo.add(new Span("Estado: " + orderDto.getPayment().getPaymentStatus()));
-            paymentInfo.add(new Span("Total: €" + orderDto.getPayment().getPaymentAmount()));
+            paymentInfo.addClassName(LumoUtility.Border.ALL);
+            paymentInfo.addClassName(LumoUtility.Padding.SMALL);
+            paymentInfo.addClassName(LumoUtility.BorderRadius.MEDIUM);
+            paymentInfo.setWidth("100%");
 
-            content.add(paymentInfo);
+            Span methodSpan = new Span("Método: " + orderDto.getPayment().getPaymentMethod());
+            methodSpan.addClassNames(LumoUtility.FontSize.SMALL);
+
+            Span statusSpan = new Span("Estado: " + orderDto.getPayment().getPaymentStatus());
+            statusSpan.addClassNames(LumoUtility.FontSize.SMALL);
+
+            Span amountSpan = new Span("Total: €" + orderDto.getPayment().getPaymentAmount());
+            amountSpan.addClassNames(LumoUtility.FontSize.SMALL, LumoUtility.FontWeight.BOLD);
+
+            paymentInfo.add(methodSpan, statusSpan, amountSpan);
+            paymentSection.add(paymentInfo);
         }
+
+        // Delivery Address (middle)
+        VerticalLayout deliverySection = new VerticalLayout();
+        deliverySection.setPadding(false);
+        deliverySection.setSpacing(false);
+        deliverySection.setWidth("33%");
+
+        H3 deliveryTitle = new H3("Dirección:");
+        deliveryTitle.addClassNames(LumoUtility.Margin.Top.NONE, LumoUtility.Margin.Bottom.SMALL);
+        deliverySection.add(deliveryTitle);
+
+        VerticalLayout deliveryInfo = new VerticalLayout();
+        deliveryInfo.setPadding(false);
+        deliveryInfo.setSpacing(false);
+        deliveryInfo.addClassName(LumoUtility.Border.ALL);
+        deliveryInfo.addClassName(LumoUtility.Padding.SMALL);
+        deliveryInfo.addClassName(LumoUtility.BorderRadius.MEDIUM);
+        deliveryInfo.setWidth("100%");
+
+        if (orderDto.getDeliveryAddress() != null && !orderDto.getDeliveryAddress().isEmpty()) {
+            Span addressSpan = new Span(orderDto.getDeliveryAddress());
+            addressSpan.addClassNames(LumoUtility.FontSize.SMALL);
+            deliveryInfo.add(addressSpan);
+        } else {
+            Span emptyAddress = new Span("No especificada");
+            emptyAddress.addClassNames(LumoUtility.TextColor.SECONDARY, LumoUtility.FontSize.SMALL);
+            deliveryInfo.add(emptyAddress);
+        }
+        deliverySection.add(deliveryInfo);
+
+        // Notes (right)
+        VerticalLayout notesSection = new VerticalLayout();
+        notesSection.setPadding(false);
+        notesSection.setSpacing(false);
+        notesSection.setWidth("33%");
+
+        H3 notesTitle = new H3("Notas:");
+        notesTitle.addClassNames(LumoUtility.Margin.Top.NONE, LumoUtility.Margin.Bottom.SMALL);
+        notesSection.add(notesTitle);
+
+        VerticalLayout notesInfo = new VerticalLayout();
+        notesInfo.setPadding(false);
+        notesInfo.setSpacing(false);
+        notesInfo.addClassName(LumoUtility.Border.ALL);
+        notesInfo.addClassName(LumoUtility.Padding.SMALL);
+        notesInfo.addClassName(LumoUtility.BorderRadius.MEDIUM);
+        notesInfo.setWidth("100%");
+
+        if (orderDto.getNotes() != null && !orderDto.getNotes().isEmpty()) {
+            Span notesSpan = new Span(orderDto.getNotes());
+            notesSpan.addClassNames(LumoUtility.FontSize.SMALL);
+            notesInfo.add(notesSpan);
+        } else {
+            Span emptyNotes = new Span("Sin notas");
+            emptyNotes.addClassNames(LumoUtility.TextColor.SECONDARY, LumoUtility.FontSize.SMALL);
+            notesInfo.add(emptyNotes);
+        }
+        notesSection.add(notesInfo);
+
+        bottomLayout.add(paymentSection, deliverySection, notesSection);
+        content.add(bottomLayout);
 
         Button closeBtn = new Button("Cerrar", e -> dialog.close());
         closeBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
