@@ -512,7 +512,13 @@ public class OrderService {
         completedOrders.forEach(order -> {
             LocalDate orderDate = order.getDate();
             SalesStatisticsDto stats = statisticsMap.computeIfAbsent(orderDate,
-                    date -> new SalesStatisticsDto(date, 0, 0.0));
+                    date -> SalesStatisticsDto.builder()
+                            .date(date)
+                            .quantitySold(0)
+                            .totalRevenue(0.0)
+                            .numberOfOrders(0)
+                            .averageOrderValue(0.0)
+                            .build());
 
             double orderTotal = 0.0;
             if (order.getItems() != null) {
@@ -562,12 +568,14 @@ public class OrderService {
                 for (ProductList item : order.getItems()) {
                     String productKey = item.getProductId() + "_" + item.getProductName();
                     SalesStatisticsDto stats = statisticsMap.computeIfAbsent(productKey,
-                            key -> new SalesStatisticsDto(
-                                    item.getProductName(),
-                                    item.getProductId(),
-                                    0,
-                                    0.0
-                            ));
+                            key -> SalesStatisticsDto.builder()
+                                    .productName(item.getProductName())
+                                    .productId(item.getProductId())
+                                    .quantitySold(0)
+                                    .totalRevenue(0.0)
+                                    .numberOfOrders(0)
+                                    .averageOrderValue(0.0)
+                                    .build());
 
                     int quantity = item.getQuantity();
                     double itemTotal = item.getPrice() * quantity;

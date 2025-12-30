@@ -137,9 +137,17 @@ public class OrderManagementComponent extends VerticalLayout {
             viewBtn.addThemeVariants(ButtonVariant.LUMO_SMALL);
             viewBtn.addClickListener(e -> openOrderDetailsDialog(orderDto));
 
+            // Agregar botón de pago solo para pedidos PENDING
+            if (orderDto.getStatus() == OrderStatus.PENDING) {
+                Button payBtn = new Button("Pagar", new Icon(VaadinIcon.CREDIT_CARD));
+                payBtn.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_SUCCESS);
+                payBtn.addClickListener(e -> openPaymentGateway(orderDto));
+                statusLayout.add(payBtn);
+            }
+
             statusLayout.add(statusSelect, updateBtn, viewBtn);
             return statusLayout;
-        }).setHeader("Acciones").setWidth("400px");
+        }).setHeader("Acciones").setWidth("500px");
 
         add(ordersGrid);
 
@@ -307,6 +315,18 @@ public class OrderManagementComponent extends VerticalLayout {
         if (ordersGrid != null) {
             ordersGrid.setItems(allOrders);
         }
+    }
+
+    /**
+     * Opens the payment gateway dialog for a specific order
+     */
+    private void openPaymentGateway(OrderDto order) {
+        PaymentGatewayComponent paymentGateway = new PaymentGatewayComponent(
+                order,
+                orderService,
+                this::loadOrders
+        );
+        paymentGateway.open();
     }
 }
 

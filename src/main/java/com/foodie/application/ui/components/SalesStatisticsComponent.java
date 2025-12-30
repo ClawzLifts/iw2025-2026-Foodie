@@ -3,6 +3,7 @@ package com.foodie.application.ui.components;
 import com.foodie.application.dto.SalesStatisticsDto;
 import com.foodie.application.service.OrderService;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
@@ -87,6 +88,7 @@ public class SalesStatisticsComponent extends VerticalLayout {
         HorizontalLayout dateFilterLayout = new HorizontalLayout();
         dateFilterLayout.setPadding(true);
         dateFilterLayout.setSpacing(true);
+        dateFilterLayout.setAlignItems(FlexComponent.Alignment.END);
         dateFilterLayout.addClassNames(
                 LumoUtility.Background.BASE,
                 LumoUtility.BorderRadius.MEDIUM,
@@ -107,6 +109,7 @@ public class SalesStatisticsComponent extends VerticalLayout {
         endDatePicker.setWidth("200px");
 
         Button searchButton = new Button("Buscar", VaadinIcon.SEARCH.create());
+        searchButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         searchButton.addClickListener(event -> refreshStatistics());
 
         dateFilterLayout.add(startDatePicker, endDatePicker, searchButton);
