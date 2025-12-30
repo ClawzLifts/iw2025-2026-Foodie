@@ -1,11 +1,12 @@
 package com.foodie.application.ui.views;
 
-import com.foodie.application.domain.Order;
 import com.foodie.application.domain.OrderStatus;
-import com.foodie.application.domain.ProductList;
+import com.foodie.application.dto.OrderDto;
+import com.foodie.application.dto.ProductListDto;
 import com.foodie.application.service.OrderService;
 import com.foodie.application.service.UserService;
 import com.foodie.application.ui.MainLayout;
+import com.foodie.application.ui.components.PaymentGatewayComponent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
@@ -40,7 +41,7 @@ public class MyOrdersView extends VerticalLayout {
     private final OrderService orderService;
     private final UserService userService;
 
-    private Grid<Order> ordersGrid;
+    private Grid<OrderDto> ordersGrid;
     private Div emptyStateDiv;
 
     public MyOrdersView(OrderService orderService, UserService userService) {
@@ -120,7 +121,7 @@ public class MyOrdersView extends VerticalLayout {
         emptyStateDiv.add(iconDiv, emptyTitle, emptyText, orderButton);
 
         // Orders grid
-        ordersGrid = new Grid<>(Order.class, false);
+        ordersGrid = new Grid<>(OrderDto.class, false);
         ordersGrid.addColumn(order -> {
             if (order.getDate() != null) {
                 return order.getDate().toString();
@@ -153,10 +154,23 @@ public class MyOrdersView extends VerticalLayout {
         }).setHeader("Estado").setAutoWidth(true);
 
         ordersGrid.addComponentColumn(order -> {
+            HorizontalLayout actions = new HorizontalLayout();
+            actions.setSpacing(true);
+
+            // Show pay button only for PENDING orders
+            if (order.getStatus() == OrderStatus.PENDING) {
+                Button payButton = new Button("Pagar", new Icon(VaadinIcon.CREDIT_CARD));
+                payButton.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_SUCCESS);
+                payButton.addClickListener(e -> openPaymentGateway(order));
+                actions.add(payButton);
+            }
+
             Button detailsButton = new Button("Detalles", new Icon(VaadinIcon.EYE));
             detailsButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
             detailsButton.addClickListener(e -> showOrderDetails(order));
-            return detailsButton;
+            actions.add(detailsButton);
+
+            return actions;
         }).setHeader("Acción").setAutoWidth(true);
 
         ordersGrid.setAllRowsVisible(true);
@@ -183,7 +197,13 @@ public class MyOrdersView extends VerticalLayout {
             return;
         }
 
-        List<Order> userOrders = orderService.getOrdersByUserId(currentUser.getId());
+        // Get all orders as DTOs
+        List<OrderDto> allOrders = orderService.getAllOrdersAsDto();
+
+        // Filter by current user
+        List<OrderDto> userOrders = allOrders.stream()
+                .filter(order -> order.getUsername().equals(currentUser.getUsername()))
+                .toList();
 
         if (userOrders == null || userOrders.isEmpty()) {
             // Show empty state
@@ -200,7 +220,7 @@ public class MyOrdersView extends VerticalLayout {
     /**
      * Shows details dialog for a specific order
      */
-    private void showOrderDetails(Order order) {
+    private void showOrderDetails(OrderDto order) {
         Dialog detailsDialog = new Dialog();
         detailsDialog.setHeaderTitle("Detalles del Pedido #" + order.getId());
         detailsDialog.setWidth("600px");
@@ -253,7 +273,7 @@ public class MyOrdersView extends VerticalLayout {
         itemsList.setSpacing(true);
 
         if (order.getItems() != null && !order.getItems().isEmpty()) {
-            for (ProductList item : order.getItems()) {
+            for (ProductListDto item : order.getItems()) {
                 Div itemDiv = createItemDiv(item);
                 itemsList.add(itemDiv);
             }
@@ -321,7 +341,7 @@ public class MyOrdersView extends VerticalLayout {
     /**
      * Creates a visual representation of an order item
      */
-    private Div createItemDiv(ProductList item) {
+    private Div createItemDiv(ProductListDto item) {
         Div itemDiv = new Div();
         itemDiv.addClassNames(
                 LumoUtility.Border.ALL,
@@ -360,7 +380,7 @@ public class MyOrdersView extends VerticalLayout {
     /**
      * Shows confirmation dialog for canceling an order
      */
-    private void confirmCancelOrder(Order order, Dialog parentDialog) {
+    private void confirmCancelOrder(OrderDto order, Dialog parentDialog) {
         ConfirmDialog cancelDialog = new ConfirmDialog();
         cancelDialog.setHeader("Cancelar Pedido");
         cancelDialog.setText("¿Estás seguro de que deseas cancelar este pedido? Esta acción no se puede deshacer.");
@@ -437,6 +457,18 @@ public class MyOrdersView extends VerticalLayout {
             case "REFUNDED" -> "↩ Reembolsado";
             default -> status;
         };
+    }
+
+    /**
+     * Opens the payment gateway dialog for a specific order
+     */
+    private void openPaymentGateway(OrderDto order) {
+        PaymentGatewayComponent paymentGateway = new PaymentGatewayComponent(
+                order,
+                orderService,
+                this::loadOrders
+        );
+        paymentGateway.open();
     }
 }
 
