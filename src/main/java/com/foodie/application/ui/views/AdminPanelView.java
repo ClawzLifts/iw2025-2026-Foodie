@@ -1,6 +1,7 @@
 package com.foodie.application.ui.views;
 
 import com.foodie.application.service.AllergenService;
+import com.foodie.application.service.CashClosingService;
 import com.foodie.application.service.IngredientService;
 import com.foodie.application.service.MenuItemService;
 import com.foodie.application.service.MenuService;
@@ -8,6 +9,7 @@ import com.foodie.application.service.OrderService;
 import com.foodie.application.service.ProductService;
 import com.foodie.application.service.UserService;
 import com.foodie.application.ui.MainLayout;
+import com.foodie.application.ui.components.CashClosingComponent;
 import com.foodie.application.ui.components.MenuManagementComponent;
 import com.foodie.application.ui.components.OrderManagementComponent;
 import com.foodie.application.ui.components.ProductManagementComponent;
@@ -45,12 +47,13 @@ public class AdminPanelView extends VerticalLayout {
     private final AllergenService allergenService;
     private final IngredientService ingredientService;
     private final UserService userService;
+    private final CashClosingService cashClosingService;
 
     private VerticalLayout contentContainer;
 
     public AdminPanelView(MenuService menuService, MenuItemService menuItemService,
                          ProductService productService, OrderService orderService, AllergenService allergenService,
-                         IngredientService ingredientService, UserService userService) {
+                         IngredientService ingredientService, UserService userService, CashClosingService cashClosingService) {
         this.menuService = menuService;
         this.menuItemService = menuItemService;
         this.productService = productService;
@@ -58,6 +61,7 @@ public class AdminPanelView extends VerticalLayout {
         this.allergenService = allergenService;
         this.ingredientService = ingredientService;
         this.userService = userService;
+        this.cashClosingService = cashClosingService;
 
         addClassName("admin-panel-view");
         setSizeFull();
@@ -110,7 +114,10 @@ public class AdminPanelView extends VerticalLayout {
         Tab statisticsTab = new Tab();
         statisticsTab.add(new Icon(VaadinIcon.BAR_CHART), new Span("Estadísticas"));
 
-        Tabs tabs = new Tabs(menusTab, productsTab, usersTab, ordersTab, statisticsTab);
+        Tab cashClosingTab = new Tab();
+        cashClosingTab.add(new Icon(VaadinIcon.WALLET), new Span("Control de Caja"));
+
+        Tabs tabs = new Tabs(menusTab, productsTab, usersTab, ordersTab, statisticsTab, cashClosingTab);
         tabs.addClassNames(
                 LumoUtility.BorderRadius.MEDIUM,
                 LumoUtility.Background.BASE,
@@ -134,6 +141,8 @@ public class AdminPanelView extends VerticalLayout {
                 showOrdersTab();
             } else if (selectedTab == statisticsTab) {
                 showStatisticsTab();
+            } else if (selectedTab == cashClosingTab) {
+                showCashClosingTab();
             }
         });
 
@@ -184,6 +193,15 @@ public class AdminPanelView extends VerticalLayout {
         contentContainer.removeAll();
         SalesStatisticsComponent statisticsComponent = new SalesStatisticsComponent(orderService);
         contentContainer.add(statisticsComponent);
+    }
+
+    /**
+     * Displays the cash closing tab
+     */
+    private void showCashClosingTab() {
+        contentContainer.removeAll();
+        CashClosingComponent cashClosingComponent = new CashClosingComponent(cashClosingService);
+        contentContainer.add(cashClosingComponent);
     }
 }
 
