@@ -147,6 +147,14 @@ public class OrderManagementComponent extends VerticalLayout {
                 statusLayout.add(payBtn);
             }
 
+            // Agregar botón de ticket/factura solo para pedidos COMPLETED
+            if (orderDto.getStatus() == OrderStatus.COMPLETED) {
+                Button invoiceBtn = new Button("Ticket/Factura", new Icon(VaadinIcon.FILE_TEXT));
+                invoiceBtn.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_SUCCESS);
+                invoiceBtn.addClickListener(e -> InvoiceDialogComponent.showInvoice(orderDto));
+                statusLayout.add(invoiceBtn);
+            }
+
             statusLayout.add(statusSelect, updateBtn, viewBtn);
             return statusLayout;
         }).setHeader("Acciones").setFlexGrow(3).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);

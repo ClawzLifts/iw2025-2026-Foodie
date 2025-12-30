@@ -7,6 +7,7 @@ import com.foodie.application.service.OrderService;
 import com.foodie.application.service.UserService;
 import com.foodie.application.ui.MainLayout;
 import com.foodie.application.ui.components.PaymentGatewayComponent;
+import com.foodie.application.ui.components.InvoiceDialogComponent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
@@ -165,6 +166,14 @@ public class MyOrdersView extends VerticalLayout {
                 actions.add(payButton);
             }
 
+            // Show ticket/invoice button only for COMPLETED orders
+            if (order.getStatus() == OrderStatus.COMPLETED) {
+                Button invoiceButton = new Button("Ticket/Factura", new Icon(VaadinIcon.FILE_TEXT));
+                invoiceButton.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_SUCCESS);
+                invoiceButton.addClickListener(e -> InvoiceDialogComponent.showInvoice(order));
+                actions.add(invoiceButton);
+            }
+
             Button detailsButton = new Button("Detalles", new Icon(VaadinIcon.EYE));
             detailsButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
             detailsButton.addClickListener(e -> showOrderDetails(order));
@@ -295,6 +304,14 @@ public class MyOrdersView extends VerticalLayout {
             cancelButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
             cancelButton.addClickListener(e -> confirmCancelOrder(order, detailsDialog));
             actionLayout.add(cancelButton);
+        }
+
+        // Add ticket/invoice button for completed orders
+        if (order.getStatus() == OrderStatus.COMPLETED) {
+            Button invoiceButton = new Button("Ticket/Factura", new Icon(VaadinIcon.FILE_TEXT));
+            invoiceButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
+            invoiceButton.addClickListener(e -> InvoiceDialogComponent.showInvoice(order));
+            actionLayout.add(invoiceButton);
         }
 
         actionLayout.add(closeButton);
