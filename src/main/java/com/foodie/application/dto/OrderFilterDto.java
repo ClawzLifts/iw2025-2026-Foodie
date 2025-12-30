@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  * Data Transfer Object for order filtering parameters.
@@ -34,12 +34,12 @@ public class OrderFilterDto {
      * The start date of the range (inclusive).
      * If null, no start date filtering is applied.
      */
-    private Date startDate;
+    private LocalDate startDate;
 
     /**
      * The end date of the range (inclusive).
      * If null, no end date filtering is applied.
      */
-    private Date endDate;
+    private LocalDate endDate;
 }
 

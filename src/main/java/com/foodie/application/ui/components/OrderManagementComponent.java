@@ -54,12 +54,19 @@ public class OrderManagementComponent extends VerticalLayout {
     private void initializeComponent() {
         H2 title = new H2("Gestión de Pedidos");
         title.addClassNames(LumoUtility.Margin.Top.NONE);
-        add(title);
+
+        HorizontalLayout titleLayout = new HorizontalLayout();
+        titleLayout.setWidthFull();
+        titleLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        titleLayout.add(title);
+        add(titleLayout);
 
         // Filtros
         HorizontalLayout filterLayout = new HorizontalLayout();
         filterLayout.setSpacing(true);
         filterLayout.setAlignItems(FlexComponent.Alignment.END);
+        filterLayout.setWidthFull();
+        filterLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
 
         // Filtro de fecha desde
         DatePicker fromDatePicker = new DatePicker("Desde");
@@ -192,8 +199,8 @@ public class OrderManagementComponent extends VerticalLayout {
      */
     private void filterOrders(LocalDate fromDate, LocalDate toDate, OrderStatus statusFilter) {
         OrderFilterDto filterDto = OrderFilterDto.builder()
-                .startDate(fromDate != null ? java.sql.Date.valueOf(fromDate) : null)
-                .endDate(toDate != null ? java.sql.Date.valueOf(toDate) : null)
+                .startDate(fromDate)
+                .endDate(toDate)
                 .status(statusFilter != null ? statusFilter.toString() : null)
                 .build();
 

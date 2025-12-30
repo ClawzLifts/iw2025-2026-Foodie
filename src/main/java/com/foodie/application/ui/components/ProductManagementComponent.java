@@ -49,32 +49,32 @@ public class ProductManagementComponent extends VerticalLayout {
     }
 
     private void initializeComponent() {
-        // Header with add button
-        HorizontalLayout headerLayout = new HorizontalLayout();
+        // Header with title
         H2 title = new H2("Gestión de Productos");
         title.addClassNames(LumoUtility.Margin.Top.NONE);
 
-        Button addProductBtn = new Button("Crear Nuevo Producto", new Icon(VaadinIcon.PLUS));
-        addProductBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        addProductBtn.addClickListener(e -> openAddProductDialog());
+        HorizontalLayout titleLayout = new HorizontalLayout();
+        titleLayout.setWidthFull();
+        titleLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        titleLayout.add(title);
+        add(titleLayout);
 
-        headerLayout.add(title);
-        headerLayout.expand(title);
-        headerLayout.add(addProductBtn);
-        headerLayout.setWidthFull();
-        headerLayout.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
-
-        add(headerLayout);
-
-        // Search bar
+        // Search bar and add button
         TextField searchField = new TextField();
         searchField.setPlaceholder("Buscar producto por nombre...");
         searchField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
         searchField.setWidth("300px");
 
+        Button addProductBtn = new Button("Crear Nuevo Producto", new Icon(VaadinIcon.PLUS));
+        addProductBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        addProductBtn.addClickListener(e -> openAddProductDialog());
+
         HorizontalLayout searchLayout = new HorizontalLayout();
-        searchLayout.add(searchField);
         searchLayout.setWidthFull();
+        searchLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        searchLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+        searchLayout.setSpacing(true);
+        searchLayout.add(searchField, addProductBtn);
         add(searchLayout);
 
         // Products Grid

@@ -10,6 +10,7 @@ import com.foodie.application.ui.MainLayout;
 import com.foodie.application.ui.components.MenuManagementComponent;
 import com.foodie.application.ui.components.OrderManagementComponent;
 import com.foodie.application.ui.components.ProductManagementComponent;
+import com.foodie.application.ui.components.SalesStatisticsComponent;
 import com.foodie.application.ui.components.UserManagementComponent;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Span;
@@ -109,7 +110,10 @@ public class AdminPanelView extends VerticalLayout {
         Tab ordersTab = new Tab();
         ordersTab.add(new Icon(VaadinIcon.CART), new Span("Pedidos"));
 
-        Tabs tabs = new Tabs(menusTab, productsTab, usersTab, ordersTab);
+        Tab statisticsTab = new Tab();
+        statisticsTab.add(new Icon(VaadinIcon.BAR_CHART), new Span("Estadísticas"));
+
+        Tabs tabs = new Tabs(menusTab, productsTab, usersTab, ordersTab, statisticsTab);
         tabs.addClassNames(
                 LumoUtility.BorderRadius.MEDIUM,
                 LumoUtility.Background.BASE,
@@ -131,6 +135,8 @@ public class AdminPanelView extends VerticalLayout {
                 showUsersTab();
             } else if (selectedTab == ordersTab) {
                 showOrdersTab();
+            } else if (selectedTab == statisticsTab) {
+                showStatisticsTab();
             }
         });
 
@@ -172,6 +178,15 @@ public class AdminPanelView extends VerticalLayout {
         contentContainer.removeAll();
         OrderManagementComponent orderComponent = new OrderManagementComponent(orderService);
         contentContainer.add(orderComponent);
+    }
+
+    /**
+     * Displays the sales statistics tab
+     */
+    private void showStatisticsTab() {
+        contentContainer.removeAll();
+        SalesStatisticsComponent statisticsComponent = new SalesStatisticsComponent(orderService);
+        contentContainer.add(statisticsComponent);
     }
 }
 

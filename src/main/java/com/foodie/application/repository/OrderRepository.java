@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -45,7 +45,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
      * @return a list of orders created within the date range
      */
     @Query("SELECT o FROM Order o WHERE o.date >= :startDate AND o.date <= :endDate")
-    List<Order> findByDateRange(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+    List<Order> findByDateRange(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
     /**
      * Finds all orders with a specific status created within a date range.
@@ -60,6 +60,6 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
      */
     @Query("SELECT o FROM Order o WHERE o.status = :status AND o.date >= :startDate AND o.date <= :endDate")
     List<Order> findByStatusAndDateRange(@Param("status") OrderStatus status,
-                                         @Param("startDate") Date startDate,
-                                         @Param("endDate") Date endDate);
+                                         @Param("startDate") LocalDate startDate,
+                                         @Param("endDate") LocalDate endDate);
 }

@@ -44,15 +44,14 @@ public class UserManagementComponent extends VerticalLayout {
 
     private void initializeComponent() {
         // Header with title
-        HorizontalLayout headerLayout = new HorizontalLayout();
         H2 title = new H2("Gestión de Usuarios");
         title.addClassNames(LumoUtility.Margin.Top.NONE);
 
-        headerLayout.add(title);
-        headerLayout.setWidthFull();
-        headerLayout.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
-
-        add(headerLayout);
+        HorizontalLayout titleLayout = new HorizontalLayout();
+        titleLayout.setWidthFull();
+        titleLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        titleLayout.add(title);
+        add(titleLayout);
 
         // Search bar
         TextField searchField = new TextField();
@@ -61,8 +60,9 @@ public class UserManagementComponent extends VerticalLayout {
         searchField.setWidth("300px");
 
         HorizontalLayout searchLayout = new HorizontalLayout();
-        searchLayout.add(searchField);
         searchLayout.setWidthFull();
+        searchLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        searchLayout.add(searchField);
         add(searchLayout);
 
         // Users Grid

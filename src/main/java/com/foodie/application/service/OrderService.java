@@ -7,6 +7,7 @@ import com.foodie.application.domain.ProductList;
 import com.foodie.application.dto.OrderDto;
 import com.foodie.application.dto.OrderFilterDto;
 import com.foodie.application.dto.ProductListDto;
+import com.foodie.application.dto.SalesStatisticsDto;
 import com.foodie.application.repository.OrderRepository;
 import com.foodie.application.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -14,8 +15,9 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -223,7 +225,7 @@ public class OrderService {
         boolean hasDateRange = filter.getStartDate() != null && filter.getEndDate() != null;
 
         // Validate dates if provided
-        if (hasDateRange && filter.getStartDate().after(filter.getEndDate())) {
+        if (hasDateRange && filter.getStartDate().isAfter(filter.getEndDate())) {
             throw new IllegalArgumentException("Start date cannot be after end date");
         }
 
@@ -340,8 +342,8 @@ public class OrderService {
      * @return a list of orders created within the specified date range
      * @throws IllegalArgumentException if startDate is after endDate
      */
-    public List<Order> getOrdersByDateRange(Date startDate, Date endDate) {
-        if (startDate.after(endDate)) {
+    public List<Order> getOrdersByDateRange(LocalDate startDate, LocalDate endDate) {
+        if (startDate.isAfter(endDate)) {
             throw new IllegalArgumentException("Start date cannot be after end date");
         }
 
@@ -362,8 +364,8 @@ public class OrderService {
      * @return a list of orders matching both the status and date range
      * @throws IllegalArgumentException if the status string is invalid or startDate is after endDate
      */
-    public List<Order> getOrdersByStatusAndDateRange(String status, Date startDate, Date endDate) {
-        if (startDate.after(endDate)) {
+    public List<Order> getOrdersByStatusAndDateRange(String status, LocalDate startDate, LocalDate endDate) {
+        if (startDate.isAfter(endDate)) {
             throw new IllegalArgumentException("Start date cannot be after end date");
         }
 
@@ -390,8 +392,8 @@ public class OrderService {
      * @return a list of orders matching both the status and date range
      * @throws IllegalArgumentException if startDate is after endDate
      */
-    public List<Order> getOrdersByStatusAndDateRange(OrderStatus status, Date startDate, Date endDate) {
-        if (startDate.after(endDate)) {
+    public List<Order> getOrdersByStatusAndDateRange(OrderStatus status, LocalDate startDate, LocalDate endDate) {
+        if (startDate.isAfter(endDate)) {
             throw new IllegalArgumentException("Start date cannot be after end date");
         }
 
@@ -473,21 +475,118 @@ public class OrderService {
 
                     // Filter by start date if specified
                     if (filterDto.getStartDate() != null) {
-                        LocalDate startDate = new java.sql.Date(filterDto.getStartDate().getTime()).toLocalDate();
-                        if (order.getDate().isBefore(startDate)) {
+                        if (order.getDate().isBefore(filterDto.getStartDate())) {
                             return false;
                         }
                     }
 
                     // Filter by end date if specified
                     if (filterDto.getEndDate() != null) {
-                        LocalDate endDate = new java.sql.Date(filterDto.getEndDate().getTime()).toLocalDate();
-                        return !order.getDate().isAfter(endDate);
+                        return !order.getDate().isAfter(filterDto.getEndDate());
                     }
 
                     return true;
                 })
                 .map(OrderDto::fromOrder)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves sales statistics grouped by date within a specified date range.
+     * Only includes completed orders in the statistics.
+     *
+     * @param startDate the start date of the range (inclusive)
+     * @param endDate the end date of the range (inclusive)
+     * @return a list of SalesStatisticsDto containing date-based statistics
+     */
+    @Transactional
+    public List<SalesStatisticsDto> getSalesStatisticsByDate(LocalDate startDate, LocalDate endDate) {
+        List<Order> completedOrders = getOrdersByStatusAndDateRange(
+                OrderStatus.COMPLETED,
+                startDate,
+                endDate
+        );
+
+        Map<LocalDate, SalesStatisticsDto> statisticsMap = new HashMap<>();
+
+        completedOrders.forEach(order -> {
+            LocalDate orderDate = order.getDate();
+            SalesStatisticsDto stats = statisticsMap.computeIfAbsent(orderDate,
+                    date -> new SalesStatisticsDto(date, 0, 0.0));
+
+            double orderTotal = 0.0;
+            if (order.getItems() != null) {
+                for (ProductList item : order.getItems()) {
+                    int quantity = item.getQuantity();
+                    double itemTotal = item.getPrice() * quantity;
+                    stats.setQuantitySold(stats.getQuantitySold() + quantity);
+                    orderTotal += itemTotal;
+                }
+            }
+            stats.setTotalRevenue(stats.getTotalRevenue() + orderTotal);
+            stats.setNumberOfOrders(stats.getNumberOfOrders() + 1);
+        });
+
+        // Calculate average order value
+        statisticsMap.values().forEach(stats -> {
+            if (stats.getNumberOfOrders() > 0) {
+                stats.setAverageOrderValue(stats.getTotalRevenue() / stats.getNumberOfOrders());
+            }
+        });
+
+        return statisticsMap.values().stream()
+                .sorted((s1, s2) -> s2.getDate().compareTo(s1.getDate()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves sales statistics grouped by product within a specified date range.
+     * Only includes completed orders in the statistics.
+     *
+     * @param startDate the start date of the range (inclusive)
+     * @param endDate the end date of the range (inclusive)
+     * @return a list of SalesStatisticsDto containing product-based statistics
+     */
+    @Transactional
+    public List<SalesStatisticsDto> getSalesStatisticsByProduct(LocalDate startDate, LocalDate endDate) {
+        List<Order> completedOrders = getOrdersByStatusAndDateRange(
+                OrderStatus.COMPLETED,
+                startDate,
+                endDate
+        );
+
+        Map<String, SalesStatisticsDto> statisticsMap = new HashMap<>();
+
+        completedOrders.forEach(order -> {
+            if (order.getItems() != null) {
+                for (ProductList item : order.getItems()) {
+                    String productKey = item.getProductId() + "_" + item.getProductName();
+                    SalesStatisticsDto stats = statisticsMap.computeIfAbsent(productKey,
+                            key -> new SalesStatisticsDto(
+                                    item.getProductName(),
+                                    item.getProductId(),
+                                    0,
+                                    0.0
+                            ));
+
+                    int quantity = item.getQuantity();
+                    double itemTotal = item.getPrice() * quantity;
+                    stats.setQuantitySold(stats.getQuantitySold() + quantity);
+                    stats.setTotalRevenue(stats.getTotalRevenue() + itemTotal);
+                    stats.setNumberOfOrders(stats.getNumberOfOrders() + 1);
+                }
+            }
+        });
+
+        // Calculate average order value per product
+        statisticsMap.values().forEach(stats -> {
+            if (stats.getNumberOfOrders() > 0) {
+                stats.setAverageOrderValue(stats.getTotalRevenue() / stats.getNumberOfOrders());
+            }
+        });
+
+        return statisticsMap.values().stream()
+                .sorted((s1, s2) -> s2.getTotalRevenue().compareTo(s1.getTotalRevenue()))
                 .collect(Collectors.toList());
     }
 }
