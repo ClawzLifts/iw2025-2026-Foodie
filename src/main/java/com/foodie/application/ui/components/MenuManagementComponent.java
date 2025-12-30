@@ -1,7 +1,7 @@
 package com.foodie.application.ui.components;
 
 import com.foodie.application.dto.MenuDto;
-import com.foodie.application.dto.MenuItemDto;
+import com.foodie.application.dto.MenuItemDisplayDto;
 import com.foodie.application.dto.ProductDto;
 import com.foodie.application.service.MenuItemService;
 import com.foodie.application.service.MenuService;
@@ -233,15 +233,15 @@ public class MenuManagementComponent extends VerticalLayout {
         addItemBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         // Items Grid
-        Grid<MenuItemDto> itemsGrid = new Grid<>(MenuItemDto.class, false);
+        Grid<MenuItemDisplayDto> itemsGrid = new Grid<>(MenuItemDisplayDto.class, false);
         itemsGrid.setWidthFull();
         itemsGrid.addThemeVariants(GridVariant.LUMO_COMPACT);
         itemsGrid.setSelectionMode(Grid.SelectionMode.NONE);
 
-        itemsGrid.addColumn(MenuItemDto::getProductName).setHeader("Producto");
-        itemsGrid.addColumn(MenuItemDto::getProductPrice).setHeader("Precio");
-        itemsGrid.addColumn(MenuItemDto::getFeatured).setHeader("Destacado");
-        itemsGrid.addColumn(MenuItemDto::getDiscountPercentage).setHeader("Descuento %");
+        itemsGrid.addColumn(MenuItemDisplayDto::getProductName).setHeader("Producto");
+        itemsGrid.addColumn(MenuItemDisplayDto::getOriginalPrice).setHeader("Precio");
+        itemsGrid.addColumn(MenuItemDisplayDto::getFeatured).setHeader("Destacado");
+        itemsGrid.addColumn(MenuItemDisplayDto::getDiscountPercentage).setHeader("Descuento %");
 
         itemsGrid.addComponentColumn(item -> {
             HorizontalLayout actions = new HorizontalLayout();
@@ -279,12 +279,12 @@ public class MenuManagementComponent extends VerticalLayout {
         dialog.open();
     }
 
-    private void loadMenuItemsInDialog(Grid<MenuItemDto> grid, MenuDto menu) {
-        List<MenuItemDto> items = menuService.getMenuItemsForDisplay(menu.getId());
+    private void loadMenuItemsInDialog(Grid<MenuItemDisplayDto> grid, MenuDto menu) {
+        List<MenuItemDisplayDto> items = menuService.getMenuItemsForDisplay(menu.getId());
         grid.setItems(items);
     }
 
-    private void openAddMenuItemDialog(MenuDto menu, Grid<MenuItemDto> parentGrid) {
+    private void openAddMenuItemDialog(MenuDto menu, Grid<MenuItemDisplayDto> parentGrid) {
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle("Agregar Ítem al Menú");
 
@@ -338,7 +338,7 @@ public class MenuManagementComponent extends VerticalLayout {
         dialog.open();
     }
 
-    private void openEditMenuItemDialog(MenuDto menu, MenuItemDto menuItem, Grid<MenuItemDto> parentGrid) {
+    private void openEditMenuItemDialog(MenuDto menu, MenuItemDisplayDto menuItem, Grid<MenuItemDisplayDto> parentGrid) {
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle("Editar Ítem del Menú");
 
@@ -350,7 +350,7 @@ public class MenuManagementComponent extends VerticalLayout {
         productNameField.setReadOnly(true);
 
         NumberField priceField = new NumberField("Precio Original");
-        priceField.setValue(menuItem.getProductPrice());
+        priceField.setValue(menuItem.getOriginalPrice());
         priceField.setReadOnly(true);
 
         Checkbox featuredCheckbox = new Checkbox("Producto Destacado");

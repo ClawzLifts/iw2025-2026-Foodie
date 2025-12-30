@@ -4,6 +4,7 @@ import com.foodie.application.domain.Menu;
 import com.foodie.application.domain.MenuItem;
 import com.foodie.application.dto.MenuDto;
 import com.foodie.application.dto.MenuItemDto;
+import com.foodie.application.dto.MenuItemDisplayDto;
 import com.foodie.application.dto.ProductDto;
 import com.foodie.application.repository.MenuRepository;
 import jakarta.transaction.Transactional;
@@ -42,18 +43,18 @@ public class MenuService {
     }
 
     /**
-     * Gets menu items with display information including discounts and featured status.
-     * This method is specifically designed for the frontend to display products with
-     * all pricing and styling information.
+     * Gets menu items with complete display information including product details,
+     * ingredients, allergens, and discount information.
+     * This method is specifically designed for the frontend to display products.
      *
      * @param menuId the ID of the menu
      * @return list of MenuItemDisplayDto with all display information
      */
     @Transactional
-    public List<MenuItemDto> getMenuItemsForDisplay(Integer menuId) {
+    public List<MenuItemDisplayDto> getMenuItemsForDisplay(Integer menuId) {
         Optional<Menu> optMenu = menuRepository.findById(menuId);
         return optMenu.map(menu -> menu.getMenuItems().stream()
-                .map(MenuItemDto::fromMenuItem)
+                .map(MenuItemDisplayDto::fromMenuItem)
                 .collect(Collectors.toList()))
                 .orElse(new ArrayList<>());
     }

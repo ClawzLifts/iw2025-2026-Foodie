@@ -27,7 +27,7 @@ public class ProductDto implements Serializable {
     private Double price;
     private String imageUrl;
     private Set<String> allergenNames;
-    Set<String> ingredients;
+    private Set<String> ingredients;
 
 
     /**
@@ -40,6 +40,12 @@ public class ProductDto implements Serializable {
                         .collect(Collectors.toSet()) :
                 java.util.Collections.emptySet();
 
+        Set<String> ingredientNames = product.getIngredients() != null ?
+                product.getIngredients().stream()
+                        .map(Ingredient::getName)
+                        .collect(Collectors.toSet()) :
+                java.util.Collections.emptySet();
+
         return ProductDto.builder()
                 .id(product.getId())
                 .name(product.getName())
@@ -47,6 +53,7 @@ public class ProductDto implements Serializable {
                 .price(product.getPrice())
                 .imageUrl(product.getImageUrl())
                 .allergenNames(allergenNames)
+                .ingredients(ingredientNames)
                 .build();
     }
 }

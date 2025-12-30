@@ -1,6 +1,7 @@
 package com.foodie.application.ui.views;
 
 import com.foodie.application.service.AllergenService;
+import com.foodie.application.service.IngredientService;
 import com.foodie.application.service.MenuItemService;
 import com.foodie.application.service.MenuService;
 import com.foodie.application.service.OrderService;
@@ -42,17 +43,20 @@ public class AdminPanelView extends VerticalLayout {
     private final ProductService productService;
     private final OrderService orderService;
     private final AllergenService allergenService;
+    private final IngredientService ingredientService;
     private final UserService userService;
 
     private VerticalLayout contentContainer;
 
     public AdminPanelView(MenuService menuService, MenuItemService menuItemService,
-                         ProductService productService, OrderService orderService, AllergenService allergenService, UserService userService) {
+                         ProductService productService, OrderService orderService, AllergenService allergenService,
+                         IngredientService ingredientService, UserService userService) {
         this.menuService = menuService;
         this.menuItemService = menuItemService;
         this.productService = productService;
         this.orderService = orderService;
         this.allergenService = allergenService;
+        this.ingredientService = ingredientService;
         this.userService = userService;
 
         addClassName("admin-panel-view");
@@ -158,7 +162,7 @@ public class AdminPanelView extends VerticalLayout {
      */
     private void showProductsTab() {
         contentContainer.removeAll();
-        ProductManagementComponent productComponent = new ProductManagementComponent(productService, allergenService);
+        ProductManagementComponent productComponent = new ProductManagementComponent(productService, allergenService, ingredientService);
         contentContainer.add(productComponent);
     }
 

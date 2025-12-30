@@ -3,6 +3,7 @@ package com.foodie.application.ui.components;
 import com.foodie.application.dto.AllergenDto;
 import com.foodie.application.dto.ProductDto;
 import com.foodie.application.service.AllergenService;
+import com.foodie.application.service.IngredientService;
 import com.foodie.application.service.ProductService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -32,13 +33,15 @@ public class ProductManagementComponent extends VerticalLayout {
 
     private final ProductService productService;
     private final AllergenService allergenService;
+    private final IngredientService ingredientService;
 
     private Grid<ProductDto> productsGrid;
     private java.util.List<ProductDto> allProducts = new java.util.ArrayList<>();
 
-    public ProductManagementComponent(ProductService productService, AllergenService allergenService) {
+    public ProductManagementComponent(ProductService productService, AllergenService allergenService, IngredientService ingredientService) {
         this.productService = productService;
         this.allergenService = allergenService;
+        this.ingredientService = ingredientService;
 
         setPadding(false);
         setSpacing(true);
@@ -90,6 +93,18 @@ public class ProductManagementComponent extends VerticalLayout {
         productsGrid.addColumn(ProductDto::getName).setHeader("Nombre");
         productsGrid.addColumn(ProductDto::getDescription).setHeader("Descripción");
         productsGrid.addColumn(ProductDto::getPrice).setHeader("Precio");
+
+        // Columna de ingredientes
+        productsGrid.addComponentColumn(productDto -> {
+            if (productDto.getIngredients() != null && !productDto.getIngredients().isEmpty()) {
+                return new com.vaadin.flow.component.html.Span(
+                        String.join(", ", productDto.getIngredients())
+                );
+            }
+            com.vaadin.flow.component.html.Span emptySpan = new com.vaadin.flow.component.html.Span("Sin ingredientes");
+            emptySpan.addClassNames(LumoUtility.TextColor.SECONDARY);
+            return emptySpan;
+        }).setHeader("Ingredientes").setFlexGrow(1);
 
         productsGrid.addComponentColumn(productDto -> {
             HorizontalLayout actions = new HorizontalLayout();
@@ -190,7 +205,61 @@ public class ProductManagementComponent extends VerticalLayout {
         newAllergenLayout.add(newAllergenField, addAllergenBtn);
         newAllergenLayout.setWidthFull();
 
-        content.add(nameField, descriptionField, priceField, imageUrlField, allergenTitle, allergenList, newAllergenLayout);
+        // Ingredientes
+        H3 ingredientTitle = new H3("Ingredientes");
+        ingredientTitle.addClassNames(LumoUtility.Margin.Top.MEDIUM);
+
+        Set<String> selectedIngredients = new HashSet<>();
+
+        VerticalLayout ingredientList = new VerticalLayout();
+        ingredientList.setPadding(false);
+        ingredientList.setSpacing(false);
+
+        // Campo para agregar ingredientes
+        HorizontalLayout newIngredientLayout = new HorizontalLayout();
+        TextField newIngredientField = new TextField();
+        newIngredientField.setPlaceholder("Nombre del ingrediente");
+        newIngredientField.setWidth("70%");
+
+        Button addIngredientBtn = new Button("Agregar", e -> {
+            if (!newIngredientField.getValue().isEmpty()) {
+                try {
+                    String ingredientName = newIngredientField.getValue();
+                    selectedIngredients.add(ingredientName);
+
+                    // Crear un label para mostrar el ingrediente con opción de borrar
+                    HorizontalLayout ingredientItem = new HorizontalLayout();
+                    ingredientItem.setAlignItems(FlexComponent.Alignment.CENTER);
+                    ingredientItem.setSpacing(true);
+
+                    com.vaadin.flow.component.html.Span ingredientLabel =
+                            new com.vaadin.flow.component.html.Span(ingredientName);
+
+                    Button removeIngredientBtn = new Button("", new Icon(VaadinIcon.CLOSE));
+                    removeIngredientBtn.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_ERROR);
+                    removeIngredientBtn.addClickListener(event -> {
+                        selectedIngredients.remove(ingredientName);
+                        ingredientList.remove(ingredientItem);
+                    });
+
+                    ingredientItem.add(ingredientLabel, removeIngredientBtn);
+                    ingredientList.add(ingredientItem);
+
+                    newIngredientField.clear();
+                    Notification.show("Ingrediente agregado", 2000, Notification.Position.TOP_CENTER)
+                            .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                } catch (Exception ex) {
+                    Notification.show("Error al agregar ingrediente", 2000, Notification.Position.TOP_CENTER)
+                            .addThemeVariants(NotificationVariant.LUMO_ERROR);
+                }
+            }
+        });
+        addIngredientBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+
+        newIngredientLayout.add(newIngredientField, addIngredientBtn);
+        newIngredientLayout.setWidthFull();
+
+        content.add(nameField, descriptionField, priceField, imageUrlField, allergenTitle, allergenList, newAllergenLayout, ingredientTitle, ingredientList, newIngredientLayout);
 
         HorizontalLayout buttonLayout = new HorizontalLayout();
         Button saveBtn = new Button("Guardar", e -> {
@@ -200,10 +269,10 @@ public class ProductManagementComponent extends VerticalLayout {
                 return;
             }
 
-            // Create product and add allergens
+            // Create product with allergens and ingredients
             try {
-                productService.createProductWithAllergenNames(nameField.getValue(), descriptionField.getValue(),
-                        priceField.getValue(), imageUrlField.getValue(), selectedAllergenNames);
+                productService.createProductWithAllergenNamesAndIngredients(nameField.getValue(), descriptionField.getValue(),
+                        priceField.getValue(), imageUrlField.getValue(), selectedAllergenNames, selectedIngredients);
 
                 Notification.show("Producto creado exitosamente", 3000, Notification.Position.TOP_CENTER)
                         .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
@@ -311,7 +380,81 @@ public class ProductManagementComponent extends VerticalLayout {
         newAllergenLayout.add(newAllergenField, addAllergenBtn);
         newAllergenLayout.setWidthFull();
 
-        content.add(nameField, descriptionField, priceField, imageUrlField, allergenTitle, allergenList, newAllergenLayout);
+        // Ingredientes
+        H3 ingredientTitle = new H3("Ingredientes");
+        ingredientTitle.addClassNames(LumoUtility.Margin.Top.MEDIUM);
+
+        Set<String> selectedIngredients = new HashSet<>(productDto.getIngredients() != null ?
+                productDto.getIngredients() : new HashSet<>());
+
+        VerticalLayout ingredientList = new VerticalLayout();
+        ingredientList.setPadding(false);
+        ingredientList.setSpacing(false);
+
+        // Mostrar ingredientes existentes
+        for (String ingredient : selectedIngredients) {
+            HorizontalLayout ingredientItem = new HorizontalLayout();
+            ingredientItem.setAlignItems(FlexComponent.Alignment.CENTER);
+            ingredientItem.setSpacing(true);
+
+            com.vaadin.flow.component.html.Span ingredientLabel =
+                    new com.vaadin.flow.component.html.Span(ingredient);
+
+            Button removeIngredientBtn = new Button("", new Icon(VaadinIcon.CLOSE));
+            removeIngredientBtn.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_ERROR);
+            removeIngredientBtn.addClickListener(event -> {
+                selectedIngredients.remove(ingredient);
+                ingredientList.remove(ingredientItem);
+            });
+
+            ingredientItem.add(ingredientLabel, removeIngredientBtn);
+            ingredientList.add(ingredientItem);
+        }
+
+        // Campo para agregar ingredientes
+        HorizontalLayout newIngredientLayout = new HorizontalLayout();
+        TextField newIngredientField = new TextField();
+        newIngredientField.setPlaceholder("Nombre del ingrediente");
+        newIngredientField.setWidth("70%");
+
+        Button addIngredientBtn = new Button("Agregar", e -> {
+            if (!newIngredientField.getValue().isEmpty()) {
+                try {
+                    String ingredientName = newIngredientField.getValue();
+                    selectedIngredients.add(ingredientName);
+
+                    HorizontalLayout ingredientItem = new HorizontalLayout();
+                    ingredientItem.setAlignItems(FlexComponent.Alignment.CENTER);
+                    ingredientItem.setSpacing(true);
+
+                    com.vaadin.flow.component.html.Span ingredientLabel =
+                            new com.vaadin.flow.component.html.Span(ingredientName);
+
+                    Button removeIngredientBtn = new Button("", new Icon(VaadinIcon.CLOSE));
+                    removeIngredientBtn.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_ERROR);
+                    removeIngredientBtn.addClickListener(event -> {
+                        selectedIngredients.remove(ingredientName);
+                        ingredientList.remove(ingredientItem);
+                    });
+
+                    ingredientItem.add(ingredientLabel, removeIngredientBtn);
+                    ingredientList.add(ingredientItem);
+
+                    newIngredientField.clear();
+                    Notification.show("Ingrediente agregado", 2000, Notification.Position.TOP_CENTER)
+                            .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                } catch (Exception ex) {
+                    Notification.show("Error al agregar ingrediente", 2000, Notification.Position.TOP_CENTER)
+                            .addThemeVariants(NotificationVariant.LUMO_ERROR);
+                }
+            }
+        });
+        addIngredientBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+
+        newIngredientLayout.add(newIngredientField, addIngredientBtn);
+        newIngredientLayout.setWidthFull();
+
+        content.add(nameField, descriptionField, priceField, imageUrlField, allergenTitle, allergenList, newAllergenLayout, ingredientTitle, ingredientList, newIngredientLayout);
 
         HorizontalLayout buttonLayout = new HorizontalLayout();
         Button saveBtn = new Button("Guardar", e -> {
@@ -322,9 +465,9 @@ public class ProductManagementComponent extends VerticalLayout {
             }
 
             try {
-                productService.updateProductWithAllergenNames(productDto.getId(), nameField.getValue(),
+                productService.updateProductWithAllergenNamesAndIngredients(productDto.getId(), nameField.getValue(),
                         descriptionField.getValue(), priceField.getValue(), imageUrlField.getValue(),
-                        selectedAllergenNames);
+                        selectedAllergenNames, selectedIngredients);
 
                 Notification.show("Producto actualizado exitosamente", 3000, Notification.Position.TOP_CENTER)
                         .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
@@ -366,10 +509,8 @@ public class ProductManagementComponent extends VerticalLayout {
     }
 
     private void loadProducts() {
-        var products = productService.getAllProducts(null);
-        allProducts = products.stream()
-                .map(ProductDto::fromProduct)
-                .toList();
+        var products = productService.getAllProductsAsDto();
+        allProducts = products;
 
         if (productsGrid != null) {
             productsGrid.setItems(allProducts);
