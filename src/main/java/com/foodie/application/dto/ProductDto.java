@@ -1,6 +1,7 @@
 package com.foodie.application.dto;
 
 import com.foodie.application.domain.Allergen;
+import com.foodie.application.domain.Ingredient;
 import com.foodie.application.domain.Product;
 import lombok.Value;
 
@@ -18,6 +19,7 @@ public class ProductDto implements Serializable {
     Double price;
     String description;
     Set<String> allergens;
+    Set<String> ingredients;
     String imageUrl;
 
     public ProductDto(Product product){
@@ -29,6 +31,11 @@ public class ProductDto implements Serializable {
         this.allergens = allergenSet == null ? Set.of() : allergenSet.stream()
                 .map(Allergen::getName)
                 .collect(Collectors.toSet());
+        Set<Ingredient> ingredientSet = product.getIngredients();
+        this.ingredients = ingredientSet == null ? Set.of() : ingredientSet.stream()
+                .map(Ingredient::getName)
+                .collect(Collectors.toSet());
         this.imageUrl = product.getImageUrl();
+
     }
 }
