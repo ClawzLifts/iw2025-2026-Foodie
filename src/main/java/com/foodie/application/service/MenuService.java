@@ -4,7 +4,6 @@ import com.foodie.application.domain.Menu;
 import com.foodie.application.domain.MenuItem;
 import com.foodie.application.dto.MenuDto;
 import com.foodie.application.dto.MenuItemDto;
-import com.foodie.application.dto.MenuItemDisplayDto;
 import com.foodie.application.dto.ProductDto;
 import com.foodie.application.repository.MenuRepository;
 import jakarta.transaction.Transactional;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class MenuService {
@@ -27,18 +27,18 @@ public class MenuService {
 
     @Transactional
     public List<MenuDto> getMenus(){
-        List<MenuDto> menus = new ArrayList<>();
-        menuRepository.findAll().forEach(menu -> menus.add(menu.toDto()));
-        return menus;
+        return menuRepository.findAll().stream()
+                .map(MenuDto::new)
+                .collect(Collectors.toList());
     }
 
     @Transactional
     public List<ProductDto> getProducts(Integer menuId) {
         Optional<Menu> optMenu = menuRepository.findById(menuId);
-        List<ProductDto> products = new ArrayList<>();
-        optMenu.ifPresent(
-                menu -> menu.getMenuItems().forEach(item -> products.add(item.getProduct().toDto())));
-        return products;
+        return optMenu.map(menu -> menu.getMenuItems().stream()
+                .map(item -> ProductDto.fromProduct(item.getProduct()))
+                .collect(Collectors.toList()))
+                .orElse(new ArrayList<>());
     }
 
     /**
@@ -50,13 +50,12 @@ public class MenuService {
      * @return list of MenuItemDisplayDto with all display information
      */
     @Transactional
-    public List<MenuItemDisplayDto> getMenuItemsForDisplay(Integer menuId) {
+    public List<MenuItemDto> getMenuItemsForDisplay(Integer menuId) {
         Optional<Menu> optMenu = menuRepository.findById(menuId);
-        List<MenuItemDisplayDto> displayItems = new ArrayList<>();
-        optMenu.ifPresent(
-                menu -> menu.getMenuItems().forEach(item ->
-                        displayItems.add(MenuItemDisplayDto.fromMenuItem(item))));
-        return displayItems;
+        return optMenu.map(menu -> menu.getMenuItems().stream()
+                .map(MenuItemDto::fromMenuItem)
+                .collect(Collectors.toList()))
+                .orElse(new ArrayList<>());
     }
 
     @Transactional

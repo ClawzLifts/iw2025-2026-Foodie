@@ -1,7 +1,7 @@
 package com.foodie.application.ui.views;
 
 import com.foodie.application.dto.MenuDto;
-import com.foodie.application.dto.MenuItemDisplayDto;
+import com.foodie.application.dto.MenuItemDto;
 import com.foodie.application.ui.MainLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.*;
@@ -92,10 +92,10 @@ public class MenuView extends HorizontalLayout {
                 cardContainer.addClassNames(LumoUtility.Gap.MEDIUM);
 
                 // Usar el nuevo método que devuelve MenuItemDisplayDto con descuentos
-                List<MenuItemDisplayDto> menuItems = menuService.getMenuItemsForDisplay(menu.getId());
+                List<MenuItemDto> menuItems = menuService.getMenuItemsForDisplay(menu.getId());
 
                 if (menuItems != null) {
-                    for (MenuItemDisplayDto item : menuItems) {
+                    for (MenuItemDto item : menuItems) {
                         cardContainer.add(createProductCard(item));
                     }
                 }
@@ -112,13 +112,7 @@ public class MenuView extends HorizontalLayout {
         return mainContent;
     }
 
-    /**
-     * Creates a product card component with pricing and featured badge
-     *
-     * @param item the MenuItemDisplayDto containing product information
-     * @return a Div component representing the product card
-     */
-    private Div createProductCard(MenuItemDisplayDto item) {
+    private Div createProductCard(MenuItemDto item) {
         Div card = new Div();
         card.addClassName("product-card");
         card.getStyle().set("max-width", "400px")
@@ -142,11 +136,11 @@ public class MenuView extends HorizontalLayout {
             card.add(badge);
         }
 
-        Image image = new Image(item.getImageUrl(), item.getName());
+        Image image = new Image(item.getImageUrl(), item.getProductName());
         image.addClassName("product-image");
         image.getStyle().setWidth("350px").setHeight("350px");
 
-        H1 name = new H1(item.getName());
+        H1 name = new H1(item.getProductName());
         name.addClassName("product-name");
         name.getStyle().set("text-align", "center").set("font-size", "26px");
 
@@ -213,7 +207,7 @@ public class MenuView extends HorizontalLayout {
      *
      * @param item the MenuItemDisplayDto to add to cart
      */
-    private void addToCart(MenuItemDisplayDto item) {
+    private void addToCart(MenuItemDto item) {
         // Usar el precio con descuento si existe
         Double priceToAdd = (item.getDiscountPercentage() != null && item.getDiscountPercentage() > 0)
                 ? item.getDiscountedPrice()
@@ -221,7 +215,7 @@ public class MenuView extends HorizontalLayout {
 
         cartService.addToCart(
                 item.getProductId(),
-                item.getName(),
+                item.getProductName(),
                 priceToAdd,
                 1
         );

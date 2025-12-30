@@ -1,11 +1,14 @@
 package com.foodie.application.domain;
 
-import com.foodie.application.dto.ProductDto;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Set;
 
+/**
+ * Product entity representing a menu item.
+ * Products can have multiple allergens associated with them.
+ */
 @Entity
 @Builder
 @AllArgsConstructor
@@ -13,12 +16,10 @@ import java.util.Set;
 @Table(name = "product")
 @Getter
 @Setter
-@ToString(exclude = "allergens") // Exclude from toString
-@EqualsAndHashCode(onlyExplicitlyIncluded = true) // Only use explicitly included fields
+@ToString(exclude = "allergens")
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EqualsAndHashCode.Include // Only include ID in equals/hashCode
     private Integer id;
 
     @Column(nullable = false)
@@ -39,8 +40,5 @@ public class Product {
             inverseJoinColumns = @JoinColumn(name = "allergen_id")
     )
     private Set<Allergen> allergens;
-
-    public ProductDto toDto(){
-        return new ProductDto(this);
-    }
 }
+

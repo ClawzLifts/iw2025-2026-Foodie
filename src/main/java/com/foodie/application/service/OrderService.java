@@ -4,6 +4,7 @@ package com.foodie.application.service;
 import com.foodie.application.domain.Order;
 import com.foodie.application.domain.OrderStatus;
 import com.foodie.application.domain.ProductList;
+import com.foodie.application.dto.OrderDto;
 import com.foodie.application.dto.OrderFilterDto;
 import com.foodie.application.dto.ProductListDto;
 import com.foodie.application.repository.OrderRepository;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -409,5 +411,83 @@ public class OrderService {
                 .orElseThrow(() -> new EntityNotFoundException("Order not found with id: " + orderID));
         order.setStatus(newStatus);
         orderRepository.save(order);
+    }
+
+    /**
+     * Retrieves all orders as DTOs.
+     * Ensures proper lazy initialization of relationships within a transaction.
+     *
+     * @return a list of all orders as OrderDto objects
+     */
+    @Transactional
+    public List<OrderDto> getAllOrdersAsDto() {
+        List<Order> orders = orderRepository.findAll();
+        // Eagerly initialize relationships within transaction
+        orders.forEach(order -> {
+            if (order.getItems() != null) {
+                order.getItems().size();
+            }
+            if (order.getPayment() != null) {
+                order.getPayment().getId();
+            }
+        });
+        return orders.stream()
+                .map(OrderDto::fromOrder)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves filtered orders as DTOs based on the provided filter criteria.
+     * Filters can be applied by status, start date, and/or end date.
+     *
+     * @param filterDto the filter criteria (status and date range)
+     * @return a list of orders matching the filter criteria as OrderDto objects
+     */
+    @Transactional
+    public List<OrderDto> getFilteredOrders(OrderFilterDto filterDto) {
+        List<Order> orders = orderRepository.findAll();
+
+        // Eagerly initialize relationships within transaction
+        orders.forEach(order -> {
+            if (order.getItems() != null) {
+                order.getItems().size();
+            }
+            if (order.getPayment() != null) {
+                order.getPayment().getId();
+            }
+        });
+
+        return orders.stream()
+                .filter(order -> {
+                    // Filter by status if specified
+                    if (filterDto.getStatus() != null && !filterDto.getStatus().isEmpty()) {
+                        try {
+                            OrderStatus status = OrderStatus.valueOf(filterDto.getStatus());
+                            if (!order.getStatus().equals(status)) {
+                                return false;
+                            }
+                        } catch (IllegalArgumentException e) {
+                            return false;
+                        }
+                    }
+
+                    // Filter by start date if specified
+                    if (filterDto.getStartDate() != null) {
+                        LocalDate startDate = new java.sql.Date(filterDto.getStartDate().getTime()).toLocalDate();
+                        if (order.getDate().isBefore(startDate)) {
+                            return false;
+                        }
+                    }
+
+                    // Filter by end date if specified
+                    if (filterDto.getEndDate() != null) {
+                        LocalDate endDate = new java.sql.Date(filterDto.getEndDate().getTime()).toLocalDate();
+                        return !order.getDate().isAfter(endDate);
+                    }
+
+                    return true;
+                })
+                .map(OrderDto::fromOrder)
+                .collect(Collectors.toList());
     }
 }

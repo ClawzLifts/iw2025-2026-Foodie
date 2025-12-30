@@ -3,7 +3,9 @@ package com.foodie.application.service;
 import com.foodie.application.domain.Menu;
 import com.foodie.application.domain.MenuItem;
 import com.foodie.application.repository.MenuItemRepository;
+import com.foodie.application.repository.MenuRepository;
 import com.foodie.application.repository.ProductRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -12,13 +14,40 @@ import java.util.List;
 @Service
 public class MenuItemService {
     private final MenuItemRepository menuItemRepository;
+    private final MenuRepository menuRepository;
     private final ProductRepository productRepository;
 
-    public MenuItemService(MenuItemRepository menuItemRepository, ProductRepository productRepository) {
+    public MenuItemService(MenuItemRepository menuItemRepository, MenuRepository menuRepository, ProductRepository productRepository) {
         this.menuItemRepository = menuItemRepository;
+        this.menuRepository = menuRepository;
         this.productRepository = productRepository;
     }
 
+    /**
+     * Adds a menu item to a menu using menu ID (for UI layer).
+     *
+     * @param productId the ID of the product
+     * @param menuId the ID of the menu
+     * @param featured whether the item is featured
+     * @param discountPercentage the discount percentage
+     * @return the created MenuItem
+     */
+    @Transactional
+    public MenuItem addMenuItem(Integer productId, Integer menuId, Boolean featured, Integer discountPercentage) {
+        Menu menu = menuRepository.findById(menuId)
+                .orElseThrow(() -> new EntityNotFoundException("Menu not found with id: " + menuId));
+        return addMenuItem(productId, menu, featured, discountPercentage);
+    }
+
+    /**
+     * Adds a menu item to a menu using Menu entity (for service layer).
+     *
+     * @param productId the ID of the product
+     * @param menu the Menu entity
+     * @param featured whether the item is featured
+     * @param discountPercentage the discount percentage
+     * @return the created MenuItem
+     */
     @Transactional
     public MenuItem addMenuItem(Integer productId, Menu menu, Boolean featured, Integer discountPercentage) {
         MenuItem menuItem = MenuItem.builder()

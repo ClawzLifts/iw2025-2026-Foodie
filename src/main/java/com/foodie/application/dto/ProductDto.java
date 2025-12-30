@@ -2,33 +2,49 @@ package com.foodie.application.dto;
 
 import com.foodie.application.domain.Allergen;
 import com.foodie.application.domain.Product;
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * DTO for {@link Product}
+ * DTO for displaying product information in the UI.
+ * Transfers product data from service to presentation layer without exposing domain model.
  */
-@Value
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductDto implements Serializable {
-    Integer id;
-    String name;
-    Double price;
-    String description;
-    Set<String> allergens;
-    String imageUrl;
+    private Integer id;
+    private String name;
+    private String description;
+    private Double price;
+    private String imageUrl;
+    private Set<String> allergenNames;
 
-    public ProductDto(Product product){
-        this.id = product.getId();
-        this.name = product.getName();
-        this.price = product.getPrice();
-        this.description = product.getDescription();
-        Set<Allergen> allergenSet = product.getAllergens();
-        this.allergens = allergenSet == null ? Set.of() : allergenSet.stream()
-                .map(Allergen::getName)
-                .collect(Collectors.toSet());
-        this.imageUrl = product.getImageUrl();
+    /**
+     * Converts a Product entity to ProductDisplayDto
+     */
+    public static ProductDto fromProduct(Product product) {
+        Set<String> allergenNames = product.getAllergens() != null ?
+                product.getAllergens().stream()
+                        .map(Allergen::getName)
+                        .collect(Collectors.toSet()) :
+                java.util.Collections.emptySet();
+
+        return ProductDto.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .description(product.getDescription())
+                .price(product.getPrice())
+                .imageUrl(product.getImageUrl())
+                .allergenNames(allergenNames)
+                .build();
     }
 }
+
