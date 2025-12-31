@@ -41,14 +41,16 @@ public class MainLayout extends AppLayout {
     }
 
     private void createHeader() {
-        DrawerToggle toggle = new DrawerToggle();
+
 
         // Create a RouterLink for the title that navigates to the landing page
         RouterLink titleLink = new RouterLink("Foodie 🍔", MainView.class);
         H1 title = new H1(titleLink);
         title.addClassNames(
                 LumoUtility.FontSize.LARGE,
-                LumoUtility.Margin.MEDIUM
+                LumoUtility.Margin.MEDIUM,
+                LumoUtility.FontWeight.BOLD,
+                LumoUtility.Margin.Left.XLARGE
         );
         // Remove underline from link
         titleLink.getStyle().set("text-decoration", "none").set("color", "inherit");
@@ -56,7 +58,7 @@ public class MainLayout extends AppLayout {
         // Create shopping cart component before using it
         shoppingCart = new ShoppingCartComponent(cartService);
 
-        HorizontalLayout header = new HorizontalLayout(toggle, title);
+        HorizontalLayout header = new HorizontalLayout(title);
         header.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
         header.expand(title);
         header.setWidthFull();
@@ -90,6 +92,13 @@ public class MainLayout extends AppLayout {
             contextMenu.addItem("📦 Mis Pedidos", e -> {
                 getUI().ifPresent(ui -> ui.navigate("myorders"));
             });
+
+            // Add Admin Panel option if user is admin
+            if (currentUser.getRole() != null && "admin".equalsIgnoreCase(currentUser.getRole().getName())) {
+                contextMenu.addItem("⚙️ Panel de Administración", e -> {
+                    getUI().ifPresent(ui -> ui.navigate("admin"));
+                });
+            }
 
             // Add separator
             contextMenu.add(new Span(""));

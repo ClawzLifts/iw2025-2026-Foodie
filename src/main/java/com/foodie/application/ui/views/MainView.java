@@ -21,49 +21,11 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 
 @Route("")
 @PageTitle("Bar Casa Manteca | Foodie")
-public class MainView extends AppLayout {
+public class MainView extends HorizontalLayout {
 
     public MainView() {
-        createHeader();
-        createDrawer();
-        setContent(createLandingPage());
-    }
-
-    private void createHeader() {
-        H1 logo = new H1("🍖 Foodie");
-        logo.addClassNames(
-                LumoUtility.FontSize.LARGE,
-                LumoUtility.Margin.MEDIUM
-        );
-
-        Button orderButton = new Button("Hacer Pedido", new Icon(VaadinIcon.CART));
-        orderButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        orderButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("foodmenu")));
-
-        var header = new HorizontalLayout(new DrawerToggle(), logo);
-        header.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
-        header.expand(logo);
-        header.setWidthFull();
-        header.addClassNames(
-                LumoUtility.Padding.Vertical.NONE,
-                LumoUtility.Padding.Horizontal.MEDIUM
-        );
-        header.addToEnd(orderButton);
-
-        addToNavbar(header);
-    }
-
-    private void createDrawer() {
-        Button pedidosButton = new Button("Pedidos Online", new Icon(VaadinIcon.CART));
-        pedidosButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("foodmenu")));
-
-        addToDrawer(new VerticalLayout(
-                new Button("Inicio", new Icon(VaadinIcon.HOME)),
-                new Button("Menú", new Icon(VaadinIcon.BOOK)),
-                new Button("Sobre Nosotros", new Icon(VaadinIcon.INFO)),
-                new Button("Contacto", new Icon(VaadinIcon.PHONE)),
-                pedidosButton
-        ));
+        VerticalLayout landingPage = createLandingPage();
+        add(landingPage);
     }
 
     private VerticalLayout createLandingPage() {
