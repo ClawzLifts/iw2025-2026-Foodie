@@ -1,5 +1,6 @@
 package com.foodie.application.ui.views;
 
+import com.foodie.application.service.EstablishmentService;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
@@ -23,7 +24,10 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 @PageTitle("Bar Casa Manteca | Foodie")
 public class MainView extends HorizontalLayout {
 
-    public MainView() {
+    private final EstablishmentService establishmentService;
+
+    public MainView(EstablishmentService establishmentService) {
+        this.establishmentService = establishmentService;
         VerticalLayout landingPage = createLandingPage();
         add(landingPage);
     }
@@ -174,51 +178,34 @@ public class MainView extends HorizontalLayout {
 
         whySection.add(whyTitle, benefitsGrid);
 
-        // CTA Section
-        VerticalLayout ctaSection = new VerticalLayout();
-        ctaSection.addClassNames(
-                LumoUtility.Padding.XLARGE,
-                LumoUtility.Background.PRIMARY,
-                LumoUtility.TextAlignment.CENTER
-        );
-        ctaSection.setWidthFull();
-        ctaSection.setAlignItems(FlexComponent.Alignment.CENTER);
-
-        H2 ctaTitle = new H2("¿Listo para Probar Nuestros Sabores?");
-        ctaTitle.addClassNames(
-                LumoUtility.FontSize.XXLARGE,
-                LumoUtility.FontWeight.BOLD,
-                LumoUtility.TextColor.PRIMARY_CONTRAST
-        );
-
-        Paragraph ctaSubtitle = new Paragraph("Accede a nuestro menú completo y realiza tu pedido ahora");
-        ctaSubtitle.addClassNames(
-                LumoUtility.FontSize.LARGE,
-                LumoUtility.TextColor.PRIMARY_CONTRAST,
-                LumoUtility.Margin.Bottom.LARGE
-        );
-
-        Button mainCTAButton = new Button("Ver Menú y Pedir Online", new Icon(VaadinIcon.CART));
-        mainCTAButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_LARGE);
-        mainCTAButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("foodmenu")));
-
-        ctaSection.add(ctaTitle, ctaSubtitle, mainCTAButton);
-
         // Footer Section
         VerticalLayout footerSection = new VerticalLayout();
         footerSection.addClassNames(
                 LumoUtility.Padding.LARGE,
-                LumoUtility.Background.CONTRAST_10,
-                LumoUtility.TextAlignment.CENTER
+                LumoUtility.Background.CONTRAST_10
         );
         footerSection.setWidthFull();
+        footerSection.setAlignItems(FlexComponent.Alignment.CENTER);
+        footerSection.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
 
         H3 footerTitle = new H3("Información de Contacto");
-        Paragraph address = new Paragraph("📍 Calle Antonio López, 1, Cádiz 11001");
-        Paragraph phone = new Paragraph("☎️ +34 956 262 255");
-        Paragraph email = new Paragraph("✉️ info@casamanteca.es");
+        footerTitle.addClassNames(
+                LumoUtility.TextAlignment.CENTER,
+                LumoUtility.Margin.Bottom.LARGE
+        );
 
-        footerSection.add(footerTitle, address, phone, email);
+        // Get establishment data
+        var establishment = establishmentService.getEstablishment();
+
+        Paragraph address = new Paragraph("📍 " +
+                (establishment.getAddress() != null ? establishment.getAddress() : "Dirección no disponible"));
+        address.addClassNames(LumoUtility.TextAlignment.CENTER);
+
+        Paragraph phone = new Paragraph("☎️ " +
+                (establishment.getPhone() != null ? establishment.getPhone() : "Teléfono no disponible"));
+        phone.addClassNames(LumoUtility.TextAlignment.CENTER);
+
+        footerSection.add(footerTitle, address, phone);
 
         // Main container
         VerticalLayout landingPage = new VerticalLayout();
@@ -226,7 +213,7 @@ public class MainView extends HorizontalLayout {
         landingPage.setSpacing(false);
         landingPage.setWidthFull();
 
-        landingPage.add(heroSection, aboutSection, specialtiesSection, whySection, ctaSection, footerSection);
+        landingPage.add(heroSection, aboutSection, specialtiesSection, whySection, footerSection);
 
         return landingPage;
     }
