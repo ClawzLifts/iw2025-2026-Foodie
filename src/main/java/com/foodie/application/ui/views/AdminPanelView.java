@@ -2,6 +2,7 @@ package com.foodie.application.ui.views;
 
 import com.foodie.application.service.AllergenService;
 import com.foodie.application.service.CashClosingService;
+import com.foodie.application.service.EstablishmentService;
 import com.foodie.application.service.IngredientService;
 import com.foodie.application.service.MenuItemService;
 import com.foodie.application.service.MenuService;
@@ -10,6 +11,7 @@ import com.foodie.application.service.ProductService;
 import com.foodie.application.service.UserService;
 import com.foodie.application.ui.MainLayout;
 import com.foodie.application.ui.components.CashClosingComponent;
+import com.foodie.application.ui.components.EstablishmentManagementComponent;
 import com.foodie.application.ui.components.MenuManagementComponent;
 import com.foodie.application.ui.components.OrderManagementComponent;
 import com.foodie.application.ui.components.ProductManagementComponent;
@@ -48,12 +50,14 @@ public class AdminPanelView extends VerticalLayout {
     private final IngredientService ingredientService;
     private final UserService userService;
     private final CashClosingService cashClosingService;
+    private final EstablishmentService establishmentService;
 
     private VerticalLayout contentContainer;
 
     public AdminPanelView(MenuService menuService, MenuItemService menuItemService,
                          ProductService productService, OrderService orderService, AllergenService allergenService,
-                         IngredientService ingredientService, UserService userService, CashClosingService cashClosingService) {
+                         IngredientService ingredientService, UserService userService, CashClosingService cashClosingService,
+                         EstablishmentService establishmentService) {
         this.menuService = menuService;
         this.menuItemService = menuItemService;
         this.productService = productService;
@@ -62,6 +66,7 @@ public class AdminPanelView extends VerticalLayout {
         this.ingredientService = ingredientService;
         this.userService = userService;
         this.cashClosingService = cashClosingService;
+        this.establishmentService = establishmentService;
 
         addClassName("admin-panel-view");
         setSizeFull();
@@ -117,7 +122,10 @@ public class AdminPanelView extends VerticalLayout {
         Tab cashClosingTab = new Tab();
         cashClosingTab.add(new Icon(VaadinIcon.WALLET), new Span("Control de Caja"));
 
-        Tabs tabs = new Tabs(menusTab, productsTab, usersTab, ordersTab, statisticsTab, cashClosingTab);
+        Tab establishmentTab = new Tab();
+        establishmentTab.add(new Icon(VaadinIcon.BUILDING), new Span("Establecimiento"));
+
+        Tabs tabs = new Tabs(menusTab, productsTab, usersTab, ordersTab, statisticsTab, cashClosingTab, establishmentTab);
         tabs.addClassNames(
                 LumoUtility.BorderRadius.MEDIUM,
                 LumoUtility.Background.BASE,
@@ -143,6 +151,8 @@ public class AdminPanelView extends VerticalLayout {
                 showStatisticsTab();
             } else if (selectedTab == cashClosingTab) {
                 showCashClosingTab();
+            } else if (selectedTab == establishmentTab) {
+                showEstablishmentTab();
             }
         });
 
@@ -202,6 +212,15 @@ public class AdminPanelView extends VerticalLayout {
         contentContainer.removeAll();
         CashClosingComponent cashClosingComponent = new CashClosingComponent(cashClosingService);
         contentContainer.add(cashClosingComponent);
+    }
+
+    /**
+     * Displays the establishment management tab
+     */
+    private void showEstablishmentTab() {
+        contentContainer.removeAll();
+        EstablishmentManagementComponent establishmentComponent = new EstablishmentManagementComponent(establishmentService);
+        contentContainer.add(establishmentComponent);
     }
 }
 
