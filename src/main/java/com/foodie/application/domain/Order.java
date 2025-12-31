@@ -29,6 +29,7 @@ public class Order {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
+    @Builder.Default
     private List<ProductList> items = new ArrayList<>();
 
     @OneToOne(cascade = CascadeType.ALL)
