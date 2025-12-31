@@ -1,19 +1,33 @@
 package com.foodie.application.dto;
 
 import com.foodie.application.domain.Allergen;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
 /**
- * DTO for {@link Allergen}
+ * DTO for displaying allergen information in the UI.
+ * Transfers allergen data from service to presentation layer without exposing domain model.
  */
-@lombok.Value
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AllergenDto implements Serializable {
-    Integer id;
-    String name;
+    private Integer id;
+    private String name;
 
-    public AllergenDto(Allergen allergen) {
-        this.id = allergen.getId();
-        this.name = allergen.getName();
+    /**
+     * Converts an Allergen entity to AllergenDisplayDto
+     */
+    public static AllergenDto fromAllergen(Allergen allergen) {
+        return AllergenDto.builder()
+                .id(allergen.getId())
+                .name(allergen.getName())
+                .build();
     }
 }
+

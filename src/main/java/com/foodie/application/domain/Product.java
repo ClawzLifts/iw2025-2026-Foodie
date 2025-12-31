@@ -1,20 +1,22 @@
 package com.foodie.application.domain;
 
-import com.foodie.application.dto.ProductDto;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Set;
 
-@Data
+/**
+ * Product entity representing a menu item.
+ * Products can have multiple allergens associated with them.
+ */
 @Entity
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "product")
+@Getter
+@Setter
+@ToString(exclude = "allergens")
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,7 +49,5 @@ public class Product {
     )
     private Set<Ingredient> ingredients;
 
-    public ProductDto toDto(){
-        return new ProductDto(this);
-    }
 }
+
