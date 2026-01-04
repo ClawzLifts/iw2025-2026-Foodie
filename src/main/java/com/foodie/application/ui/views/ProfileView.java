@@ -21,6 +21,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import jakarta.annotation.security.RolesAllowed;
 
 /**
  * Profile view for user account management.
@@ -32,6 +33,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
  */
 @Route(value = "profile", layout = MainLayout.class)
 @PageTitle("Mi Perfil | Foodie")
+@RolesAllowed({"ROLE_USER", "ROLE_ADMIN"})
 public class ProfileView extends VerticalLayout {
 
     private final UserService userService;
@@ -51,19 +53,13 @@ public class ProfileView extends VerticalLayout {
         setPadding(true);
         setSpacing(true);
 
-        // Get current user
+        // Obtener usuario actual y cargar vista
         currentUser = userService.getCurrentUser();
-
-        if (currentUser == null) {
-            add(createLoginRequiredMessage());
-            return;
+        
+        if (currentUser != null) {
+            add(createHeader());
+            add(createMainContent());
         }
-
-        // Header
-        add(createHeader());
-
-        // Main content
-        add(createMainContent());
     }
 
     /**

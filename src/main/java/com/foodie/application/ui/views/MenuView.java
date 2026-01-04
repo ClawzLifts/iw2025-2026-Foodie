@@ -15,16 +15,17 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+
 
 import com.foodie.application.service.MenuService;
 import com.foodie.application.service.CartService;
+import jakarta.annotation.security.RolesAllowed;
 
 import java.util.List;
 
 @PageTitle("Menu")
-@AnonymousAllowed
+@RolesAllowed({"ROLE_USER", "ROLE_ADMIN"})
 @Route(value = "foodmenu", layout = MainLayout.class)
 public class MenuView extends HorizontalLayout {
 

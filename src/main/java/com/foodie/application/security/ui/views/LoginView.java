@@ -1,12 +1,19 @@
 package com.foodie.application.security.ui.views;
 
+import com.foodie.application.service.UserService;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginI18n;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import com.vaadin.flow.spring.security.AuthenticationContext;
 
 @Route("login")
 @PageTitle("Iniciar Sesión | Foodie")
@@ -14,8 +21,13 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
     private final LoginForm login = new LoginForm();
+    private final AuthenticationContext authenticationContext;
+    private final UserService userService;
 
-    public LoginView() {
+    public LoginView(AuthenticationContext authenticationContext, UserService userService) {
+        this.authenticationContext = authenticationContext;
+        this.userService = userService;
+        
         setSizeFull();
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
@@ -39,10 +51,12 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         logo.setHeight("250px");
         logo.addClassNames(LumoUtility.Margin.Bottom.SMALL);
 
-        login.setAction("/perform_login");
         login.setI18n(createSpanishI18n());
         login.setForgotPasswordButtonVisible(false);
 
+        // Configurar la acción del formulario de login para usar el endpoint de Spring Security
+        login.setAction("login");
+        
         login.addClassNames(
                 LumoUtility.Width.FULL,
                 LumoUtility.TextAlignment.CENTER
@@ -61,6 +75,18 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
     // ✅ Este método se ejecuta automáticamente cuando se navega a esta vista
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
+        // Verificar si el usuario ya está autenticado
+        var currentUser = userService.getCurrentUser();
+        if (currentUser != null) {
+            // Ya está autenticado, redirigir según el rol
+            if (currentUser.getRole() != null && "ADMIN".equalsIgnoreCase(currentUser.getRole().getName())) {
+                event.forwardTo("admin");
+            } else {
+                event.forwardTo("foodmenu");
+            }
+            return;
+        }
+
         Location location = event.getLocation();
         QueryParameters queryParameters = location.getQueryParameters();
 
@@ -70,7 +96,8 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
         // También puedes verificar logout
         if (queryParameters.getParameters().containsKey("logout")) {
-            // Mostrar mensaje de logout exitoso si quieres
+            Notification.show("Sesión cerrada correctamente", 3000, Notification.Position.MIDDLE)
+                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
         }
     }
 

@@ -29,6 +29,7 @@ import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import jakarta.annotation.security.RolesAllowed;
 
 /**
  * Admin Panel View for managing menus, products, and orders.
@@ -40,6 +41,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
  */
 @Route(value = "admin", layout = MainLayout.class)
 @PageTitle("Panel de Administración | Foodie")
+@RolesAllowed("ROLE_ADMIN")
 public class AdminPanelView extends VerticalLayout {
 
     private final MenuService menuService;

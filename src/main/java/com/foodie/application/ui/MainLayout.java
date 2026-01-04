@@ -19,8 +19,10 @@ import com.foodie.application.service.CartService;
 import com.foodie.application.service.UserService;
 import com.foodie.application.ui.components.ShoppingCartComponent;
 import com.foodie.application.ui.views.MainView;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 
+@PermitAll
 public class MainLayout extends AppLayout {
 
     private final CartService cartService;
@@ -89,12 +91,18 @@ public class MainLayout extends AppLayout {
                 getUI().ifPresent(ui -> ui.navigate("profile"));
             });
 
-            contextMenu.addItem("📦 Mis Pedidos", e -> {
-                getUI().ifPresent(ui -> ui.navigate("myorders"));
-            });
+            // Add "Mis Pedidos" only for non-admin users (USER role)
+            if (currentUser.getRole() == null || !"admin".equalsIgnoreCase(currentUser.getRole().getName())) {
+                contextMenu.addItem("📦 Mis Pedidos", e -> {
+                    getUI().ifPresent(ui -> ui.navigate("myorders"));
+                });
+            }
 
             // Add Admin Panel option if user is admin
             if (currentUser.getRole() != null && "admin".equalsIgnoreCase(currentUser.getRole().getName())) {
+                contextMenu.addItem("🍔 Menú de Comida", e -> {
+                    getUI().ifPresent(ui -> ui.navigate("foodmenu"));
+                });
                 contextMenu.addItem("⚙️ Panel de Administración", e -> {
                     getUI().ifPresent(ui -> ui.navigate("admin"));
                 });
@@ -105,12 +113,23 @@ public class MainLayout extends AppLayout {
 
             // Add logout option
             contextMenu.addItem("🚪 Cerrar Sesión", e -> {
-                var request = VaadinServletRequest.getCurrent().getHttpServletRequest();
-                new SecurityContextLogoutHandler().logout(request, null, null);
-                getUI().ifPresent(ui -> {
-                    ui.getSession().close();
-                    ui.navigate("login");
-                });
+                // Usar SecurityContextLogoutHandler para hacer logout correctamente
+                var request = VaadinServletRequest.getCurrent();
+                if (request != null) {
+                    try {
+                        new SecurityContextLogoutHandler().logout(
+                            request.getHttpServletRequest(), null, null
+                        );
+                        // Redirigir a la página de login
+                        getUI().ifPresent(ui -> {
+                            ui.getSession().close();
+                            ui.getPage().setLocation("/login");
+                        });
+                    } catch (Exception ex) {
+                        // Si falla, intentar con la navegación estándar al endpoint de logout
+                        getUI().ifPresent(ui -> ui.getPage().setLocation("/logout"));
+                    }
+                }
             });
 
             header.addToEnd(avatar);

@@ -24,6 +24,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import jakarta.annotation.security.RolesAllowed;
 
 import java.util.List;
 
@@ -37,6 +38,7 @@ import java.util.List;
  */
 @Route(value = "myorders", layout = MainLayout.class)
 @PageTitle("Mis Pedidos | Foodie")
+@RolesAllowed({"ROLE_USER", "ROLE_ADMIN"})
 public class MyOrdersView extends VerticalLayout {
 
     private final OrderService orderService;
@@ -54,13 +56,9 @@ public class MyOrdersView extends VerticalLayout {
         setPadding(true);
         setSpacing(true);
 
-        // Header
+        // Cargar contenido directamente
         add(createHeader());
-
-        // Content
         add(createContent());
-
-        // Load orders
         loadOrders();
     }
 
