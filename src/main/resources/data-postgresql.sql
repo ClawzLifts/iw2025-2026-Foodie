@@ -18,7 +18,7 @@ WHERE NOT EXISTS (SELECT 1 FROM role WHERE name = 'ADMIN');
 -- Insert USER role if it doesn't exist
 INSERT INTO role (name)
 SELECT 'USER'
-    WHERE NOT EXISTS (SELECT 1 FROM role WHERE name = 'USER');
+WHERE NOT EXISTS (SELECT 1 FROM role WHERE name = 'USER');
 
 
 -- Insert default admin user if it doesn't exist
