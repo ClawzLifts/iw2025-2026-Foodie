@@ -32,6 +32,8 @@ public class SecurityConfig extends VaadinWebSecurity {
         http.authorizeHttpRequests(auth -> auth
             .requestMatchers(new AntPathRequestMatcher("/")).permitAll()
             .requestMatchers(new AntPathRequestMatcher("/main")).permitAll()
+            .requestMatchers(new AntPathRequestMatcher("/login")).permitAll()
+            .requestMatchers(new AntPathRequestMatcher("/register")).permitAll()
             .requestMatchers(new AntPathRequestMatcher("/images/**")).permitAll()
             .requestMatchers(new AntPathRequestMatcher("/image/**")).permitAll()
             .requestMatchers(new AntPathRequestMatcher("/icons/**")).permitAll()
