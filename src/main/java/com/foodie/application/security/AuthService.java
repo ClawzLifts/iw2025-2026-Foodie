@@ -28,11 +28,17 @@ public class AuthService implements UserDetailsService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
+        // Asegurarse de que el rol tenga el prefijo ROLE_
+        String roleName = user.getRole().getName().toUpperCase();
+        if (!roleName.startsWith("ROLE_")) {
+            roleName = "ROLE_" + roleName;
+        }
+
         // Aquí usamos el User.builder() de Spring Security, no UserEntity
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())
-                .roles(user.getRole().getName()) // ADMIN, CLIENTE, etc.
+                .authorities(roleName)
                 .build();
     }
 
@@ -41,7 +47,7 @@ public class AuthService implements UserDetailsService {
                 .username(username)
                 .password(passwordEncoder.encode(password))
                 .email(email)
-                .role(roleService.findOrCreateRole(role))
+                .role(roleService.findOrCreateRole(role.toUpperCase()))
                 .build();
 
         return userRepository.save(newUser);

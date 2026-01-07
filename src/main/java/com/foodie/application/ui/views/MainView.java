@@ -1,6 +1,8 @@
 package com.foodie.application.ui.views;
 
 import com.foodie.application.service.EstablishmentService;
+import com.foodie.application.service.UserService;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
@@ -15,21 +17,41 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
-@Route("")
+@Route("/")
 @PageTitle("Bar Casa Manteca | Foodie")
-public class MainView extends HorizontalLayout {
+@AnonymousAllowed
+public class MainView extends HorizontalLayout implements BeforeEnterObserver {
 
     private final EstablishmentService establishmentService;
+    private final UserService userService;
 
-    public MainView(EstablishmentService establishmentService) {
+    public MainView(EstablishmentService establishmentService, UserService userService) {
         this.establishmentService = establishmentService;
+        this.userService = userService;
         VerticalLayout landingPage = createLandingPage();
         add(landingPage);
+    }
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        // Verificar si el usuario ya está autenticado y redirigir según su rol
+        var currentUser = userService.getCurrentUser();
+        if (currentUser != null && currentUser.getRole() != null) {
+            if ("ADMIN".equalsIgnoreCase(currentUser.getRole().getName())) {
+                event.forwardTo("admin");
+            } else {
+                event.forwardTo("foodmenu");
+            }
+        }
+        event.forwardTo("");
     }
 
     private VerticalLayout createLandingPage() {
