@@ -194,15 +194,22 @@ public class MainView extends HorizontalLayout {
                 LumoUtility.Margin.Bottom.LARGE
         );
 
-        // Get establishment data
-        var establishment = establishmentService.getEstablishment();
+        // Get establishment data with default values if not found
+        String addressText = "Dirección no disponible";
+        String phoneText = "Teléfono no disponible";
 
-        Paragraph address = new Paragraph("📍 " +
-                (establishment.getAddress() != null ? establishment.getAddress() : "Dirección no disponible"));
+        try {
+            var establishment = establishmentService.getEstablishment();
+            addressText = establishment.getAddress() != null ? establishment.getAddress() : addressText;
+            phoneText = establishment.getPhone() != null ? establishment.getPhone() : phoneText;
+        } catch (Exception e) {
+            // Use default values if establishment not found
+        }
+
+        Paragraph address = new Paragraph("📍 " + addressText);
         address.addClassNames(LumoUtility.TextAlignment.CENTER);
 
-        Paragraph phone = new Paragraph("☎️ " +
-                (establishment.getPhone() != null ? establishment.getPhone() : "Teléfono no disponible"));
+        Paragraph phone = new Paragraph("☎️ " + phoneText);
         phone.addClassNames(LumoUtility.TextAlignment.CENTER);
 
         footerSection.add(footerTitle, address, phone);
