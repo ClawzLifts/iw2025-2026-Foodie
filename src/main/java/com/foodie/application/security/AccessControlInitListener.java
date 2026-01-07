@@ -1,6 +1,7 @@
 package com.foodie.application.security;
 
 import com.foodie.application.security.ui.views.LoginView;
+import com.foodie.application.security.ui.views.RegisterView;
 import com.foodie.application.ui.views.MainView;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.server.ServiceInitEvent;
@@ -30,8 +31,10 @@ public class AccessControlInitListener implements VaadinServiceInitListener {
     private void beforeEnter(BeforeEnterEvent event) {
         Class<?> navigationTarget = event.getNavigationTarget();
         
-        // Permitir acceso a la vista de login, registro y main (landing page)
-        if (LoginView.class.equals(navigationTarget) || MainView.class.equals(navigationTarget)) {
+        // Permitir acceso a la vista de login, registro y main (landing page) sin autenticación
+        if (LoginView.class.equals(navigationTarget)
+                || RegisterView.class.equals(navigationTarget)
+                || MainView.class.equals(navigationTarget)) {
             return;
         }
 
