@@ -1,0 +1,68 @@
+name: Deploy to AWS Elastic Beanstalk
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+          cache: 'maven'
+
+      - name: Build with Maven
+        run: mvn clean package -DskipTests
+
+      - name: Get timestamp
+        id: timestamp
+        run: echo "timestamp=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Generate deployment package
+        run: |
+          mkdir -p deploy
+          cp target/*.jar deploy/application.jar
+          cd deploy
+          zip -r ../deploy-${{ steps.timestamp.outputs.timestamp }}.zip .
+
+      - name: Upload to S3
+        run: |
+          aws s3 cp deploy-${{ steps.timestamp.outputs.timestamp }}.zip s3://elasticbeanstalk-${{ secrets.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}/
+
+      - name: Create application version
+        run: |
+          aws elasticbeanstalk create-application-version \
+            --application-name ${{ secrets.EB_APPLICATION_NAME }} \
+            --version-label ${{ steps.timestamp.outputs.timestamp }} \
+            --source-bundle S3Bucket="elasticbeanstalk-${{ secrets.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}",S3Key="deploy-${{ steps.timestamp.outputs.timestamp }}.zip"
+
+      - name: Deploy to Elastic Beanstalk
+        run: |
+          aws elasticbeanstalk update-environment \
+            --application-name ${{ secrets.EB_APPLICATION_NAME }} \
+            --environment-name ${{ secrets.EB_ENVIRONMENT_NAME }} \
+            --version-label ${{ steps.timestamp.outputs.timestamp }}
+
+      - name: Wait for deployment
+        run: |
+          aws elasticbeanstalk wait environment-updated \
+            --application-name ${{ secrets.EB_APPLICATION_NAME }} \
+            --environment-name ${{ secrets.EB_ENVIRONMENT_NAME }}
