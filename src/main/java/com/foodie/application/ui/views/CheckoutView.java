@@ -24,6 +24,7 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import jakarta.annotation.security.RolesAllowed;
 
 import java.util.List;
 
@@ -37,6 +38,7 @@ import java.util.List;
  */
 @Route(value = "checkout", layout = MainLayout.class)
 @PageTitle("Checkout | Foodie")
+@RolesAllowed({"ROLE_USER"})
 public class CheckoutView extends VerticalLayout implements BeforeEnterObserver {
 
     private final CartService cartService;
