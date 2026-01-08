@@ -11,7 +11,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "allergen")
+@Table(name = "allergen", indexes = {
+    @Index(name = "idx_allergen_name", columnList = "name", unique = true)
+})
 public class Allergen {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

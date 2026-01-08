@@ -5,6 +5,8 @@ import com.foodie.application.domain.Ingredient;
 import com.foodie.application.repository.IngredientRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,11 +21,13 @@ public class IngredientService {
         this.ingredientRepository = ingredientRepository;
     }
 
+    @Cacheable(value = "ingredients")
     public List<Ingredient> getAllIngredients() {
         return ingredientRepository.findAll();
     }
 
     @Transactional
+    @CacheEvict(value = "ingredients", allEntries = true)
     public Ingredient createIngredient(String ingredientName) {
         Ingredient ingredient = new Ingredient();
         ingredient.setName(ingredientName);
@@ -32,6 +36,7 @@ public class IngredientService {
     }
 
     @Transactional
+    @Cacheable(value = "ingredients", key = "#names")
     public Set<Ingredient> findOrCreateByNames(Set<String> names) {
         if (names == null || names.isEmpty()) {
             return Set.of();
@@ -43,6 +48,7 @@ public class IngredientService {
     }
 
     @Transactional
+    @CacheEvict(value = "ingredients", allEntries = true)
     public void updateIngredientName(Integer ingredientId, String newName) {
         var ingredient = ingredientRepository.findById(ingredientId)
                 .orElseThrow(() -> new EntityNotFoundException("Ingredient not found with id: " + ingredientId));

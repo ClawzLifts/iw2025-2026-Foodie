@@ -8,6 +8,8 @@ import com.foodie.application.dto.MenuItemDisplayDto;
 import com.foodie.application.dto.ProductDto;
 import com.foodie.application.repository.MenuRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -27,6 +29,7 @@ public class MenuService {
     }
 
     @Transactional
+    @Cacheable(value = "menus")
     public List<MenuDto> getMenus(){
         return menuRepository.findAll().stream()
                 .map(MenuDto::new)
@@ -34,6 +37,7 @@ public class MenuService {
     }
 
     @Transactional
+    @Cacheable(value = "products", key = "#menuId")
     public List<ProductDto> getProducts(Integer menuId) {
         Optional<Menu> optMenu = menuRepository.findById(menuId);
         return optMenu.map(menu -> menu.getMenuItems().stream()

@@ -16,7 +16,13 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(exclude = {"user", "payment"})
-@Table(name = "orders")
+@Table(name = "orders", indexes = {
+    @Index(name = "idx_user_id", columnList = "user_id"),
+    @Index(name = "idx_status", columnList = "status"),
+    @Index(name = "idx_date", columnList = "date"),
+    @Index(name = "idx_user_date", columnList = "user_id, date"),
+    @Index(name = "idx_status_date", columnList = "status, date")
+})
 public class Order {
     @Id
     @Column(unique = true, nullable = false)
